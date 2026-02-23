@@ -34,128 +34,47 @@ const filterProjects = (projects, catId) => {
     }
 };
 
-// --- 3-D Drum Scroller ---
-const ITEM_PX = 52;
-const ANGLE_DEG = 18;
-
-const DrumScroller = ({ categories, activeId, onChange }) => {
-    const n = categories.length;
-    const [idx, setIdx] = useState(() => Math.max(0, categories.findIndex(c => c.id === activeId)));
-    const [boxH, setBoxH] = useState(400);
-    const idxRef = useRef(idx);
-    const containerRef = useRef(null);
-    const startY = useRef(null);
-    const isDragging = useRef(false);
-
-    useEffect(() => {
-        const el = containerRef.current;
-        if (!el) return;
-        const ro = new ResizeObserver(([entry]) => setBoxH(entry.contentRect.height));
-        ro.observe(el);
-        setBoxH(el.clientHeight);
-        return () => ro.disconnect();
-    }, []);
-
-    useEffect(() => { idxRef.current = idx; }, [idx]);
-
-    useEffect(() => {
-        const i = categories.findIndex(c => c.id === activeId);
-        if (i >= 0 && i !== idxRef.current) { idxRef.current = i; setIdx(i); }
-    }, [activeId, categories]);
-
-    const go = useCallback((next) => {
-        const c = Math.max(0, Math.min(n - 1, next));
-        idxRef.current = c;
-        setIdx(c);
-        onChange(categories[c].id);
-    }, [n, categories, onChange]);
-
-    useEffect(() => {
-        const el = containerRef.current;
-        if (!el) return;
-        const onWheel = (e) => { e.preventDefault(); go(idxRef.current + (e.deltaY > 0 ? 1 : -1)); };
-        el.addEventListener("wheel", onWheel, { passive: false });
-        return () => el.removeEventListener("wheel", onWheel);
-    }, [go]);
-
-    const onKeyDown = (e) => {
-        if (e.key === "ArrowDown") { e.preventDefault(); go(idxRef.current + 1); }
-        if (e.key === "ArrowUp") { e.preventDefault(); go(idxRef.current - 1); }
-    };
-    const onTouchStart = (e) => { startY.current = e.touches[0].clientY; };
-    const onTouchEnd = (e) => {
-        if (startY.current == null) return;
-        const dy = startY.current - e.changedTouches[0].clientY;
-        if (Math.abs(dy) > 10) go(idxRef.current + (dy > 0 ? 1 : -1));
-        startY.current = null;
-    };
-    const onMouseDown = (e) => { startY.current = e.clientY; isDragging.current = false; };
-    const onMouseMove = (e) => {
-        if (startY.current == null) return;
-        const dy = startY.current - e.clientY;
-        if (Math.abs(dy) > 18) {
-            isDragging.current = true;
-            go(idxRef.current + (dy > 0 ? 1 : -1));
-            startY.current = e.clientY;
-        }
-    };
-    const onMouseUp = () => { startY.current = null; };
-
-    const center = boxH / 2;
-    const maxDist = Math.ceil(boxH / (2 * ITEM_PX)) + 1;
-
+// --- Modern Vertical Category Navigation ---
+const VerticalCategoryNav = ({ categories, activeId, onChange }) => {
     return (
-        <div
-            ref={containerRef}
-            tabIndex={0}
-            onKeyDown={onKeyDown}
-            onTouchStart={onTouchStart}
-            onTouchEnd={onTouchEnd}
-            onMouseDown={onMouseDown}
-            onMouseMove={onMouseMove}
-            onMouseUp={onMouseUp}
-            onMouseLeave={onMouseUp}
-            className="relative select-none outline-none w-full h-full"
-            style={{ cursor: "ns-resize", perspective: "600px", perspectiveOrigin: "50% 50%", overflow: "hidden" }}
-        >
-            <div className="pointer-events-none absolute inset-x-0 top-0 z-10"
-                style={{ height: center * 0.6, background: "linear-gradient(to bottom, var(--color-background) 0%, transparent 100%)" }} />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10"
-                style={{ height: center * 0.6, background: "linear-gradient(to top, var(--color-background) 0%, transparent 100%)" }} />
-
-            {categories.map((cat, i) => {
-                const dist = i - idx;
-                const active = dist === 0;
-                const absDist = Math.abs(dist);
-                if (boxH > 100 && absDist > maxDist) return null;
-                const top = center + dist * ITEM_PX - ITEM_PX / 2;
-                const angleX = dist * ANGLE_DEG;
-                const blurPx = Math.min(absDist * 2, 7);
-                const opa = active ? 1 : Math.max(0.08, 1 - absDist * 0.22);
-                const fSize = active ? "1.05rem" : (Math.max(0.72, 0.98 - absDist * 0.13) + "rem");
-                const fw = active ? 800 : 500;
-                const color = active ? "#f2f4f7" : "#6b7280";
+        <div className="flex flex-col w-full py-4 space-y-1">
+            {categories.map((cat) => {
+                const isActive = cat.id === activeId;
                 return (
-                    <div key={cat.id} onClick={() => !isDragging.current && go(i)}
-                        style={{
-                            position: "absolute", left: 0, right: 0, top, height: ITEM_PX,
-                            transform: "rotateX(" + angleX + "deg)",
-                            filter: "blur(" + blurPx + "px)",
-                            opacity: opa,
-                            transition: "top 0.26s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.26s ease, opacity 0.26s ease, filter 0.26s ease",
-                            transformOrigin: "50% 50%", cursor: "pointer",
-                            display: "flex", alignItems: "center", paddingLeft: "0.75rem", overflow: "hidden",
-                        }}
+                    <button
+                        key={cat.id}
+                        onClick={() => onChange(cat.id)}
+                        className={`group relative flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-left ${isActive
+                            ? "bg-primary/10 text-primary"
+                            : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+                            }`}
                     >
-                        <span style={{ width: 20, flexShrink: 0, opacity: active ? 1 : 0, transition: "opacity 0.22s", fontSize: "0.85rem", color: "#f2f4f7" }}>→</span>
-                        <span style={{
-                            fontSize: fSize, fontWeight: fw, color,
-                            fontFamily: "var(--font-heading)",
-                            letterSpacing: active ? "-0.01em" : "0.01em",
-                            transition: "font-size 0.26s ease, color 0.26s ease",
-                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0,
-                        }}>{cat.label}</span>
-                    </div>
+                        {/* Active Indicator Line */}
+                        {isActive && (
+                            <motion.div
+                                layoutId="activeCategory"
+                                className="absolute left-0 w-1 h-6 bg-primary rounded-full"
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            />
+                        )}
+
+                        <div className="flex flex-col">
+                            <span className={`text-sm font-bold font-heading tracking-wide transition-colors ${isActive ? "text-primary" : "text-inherit"}`}>
+                                {cat.label}
+                            </span>
+                            {/* Optional: Add brief counts or subtext if needed */}
+                        </div>
+
+                        {isActive && (
+                            <motion.div
+                                initial={{ opacity: 0, x: -5 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className="ml-auto"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </motion.div>
+                        )}
+                    </button>
                 );
             })}
         </div>
@@ -319,21 +238,26 @@ export const ProjectsPage = () => {
         <>
             <div className="flex min-h-screen pt-20 bg-background">
 
-                {/* ── Fixed-height sticky sidebar ─────────────────────────────── */}
+                {/* ── Sticky sidebar ─────────────────────────────── */}
                 <aside className="hidden md:flex flex-col flex-shrink-0 border-r border-white/5 sticky top-20 self-start"
-                    style={{ width: 260, height: "calc(100vh - 80px)" }}>
-                    <div className="px-6 pt-8 pb-3 flex-shrink-0">
-                        <Link to="/" className="inline-flex items-center gap-2 text-zinc-500 hover:text-primary transition-colors group text-xs font-medium">
-                            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" /> Back to Home
+                    style={{ width: 280, height: "calc(100vh - 80px)" }}>
+                    <div className="px-6 pt-10 pb-4 flex-shrink-0 border-b border-white/5 bg-zinc-950/20">
+                        <Link to="/" className="inline-flex items-center gap-2 text-zinc-500 hover:text-primary transition-colors group text-xs font-bold uppercase tracking-widest">
+                            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+                            Portfolio
                         </Link>
                     </div>
-                    <div className="px-6 pb-2 flex-shrink-0">
-                        <p className="text-[9px] font-bold tracking-[0.22em] uppercase text-zinc-600">Categories</p>
+
+                    <div className="flex-1 px-3 py-6 overflow-y-auto custom-scrollbar">
+                        <div className="px-3 mb-6">
+                            <p className="text-[10px] font-black tracking-[0.25em] uppercase text-zinc-600">Explore Work</p>
+                        </div>
+                        <VerticalCategoryNav categories={CATEGORIES} activeId={activeId} onChange={setActiveId} />
                     </div>
-                    <div className="flex-1 w-full overflow-hidden relative">
-                        <DrumScroller categories={CATEGORIES} activeId={activeId} onChange={setActiveId} />
+
+                    <div className="p-6 border-t border-white/5 bg-zinc-950/20 text-center">
+                        <p className="text-[10px] text-zinc-600 font-medium tracking-tight">Select a category to filter projects</p>
                     </div>
-                    <p className="flex-shrink-0 text-[9px] text-zinc-700 text-center tracking-widest py-5">scroll or drag</p>
                 </aside>
 
                 {/* ── Main content ────────────────────────────────────────────── */}
