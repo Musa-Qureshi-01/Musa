@@ -35,17 +35,17 @@ const filterProjects = (projects, catId) => {
 };
 
 // --- 3-D Drum Scroller ---
-const ITEM_PX   = 52;
+const ITEM_PX = 52;
 const ANGLE_DEG = 18;
 
 const DrumScroller = ({ categories, activeId, onChange }) => {
     const n = categories.length;
-    const [idx, setIdx]   = useState(() => Math.max(0, categories.findIndex(c => c.id === activeId)));
+    const [idx, setIdx] = useState(() => Math.max(0, categories.findIndex(c => c.id === activeId)));
     const [boxH, setBoxH] = useState(400);
-    const idxRef          = useRef(idx);
-    const containerRef    = useRef(null);
-    const startY          = useRef(null);
-    const isDragging      = useRef(false);
+    const idxRef = useRef(idx);
+    const containerRef = useRef(null);
+    const startY = useRef(null);
+    const isDragging = useRef(false);
 
     useEffect(() => {
         const el = containerRef.current;
@@ -78,19 +78,19 @@ const DrumScroller = ({ categories, activeId, onChange }) => {
         return () => el.removeEventListener("wheel", onWheel);
     }, [go]);
 
-    const onKeyDown    = (e) => {
+    const onKeyDown = (e) => {
         if (e.key === "ArrowDown") { e.preventDefault(); go(idxRef.current + 1); }
-        if (e.key === "ArrowUp")   { e.preventDefault(); go(idxRef.current - 1); }
+        if (e.key === "ArrowUp") { e.preventDefault(); go(idxRef.current - 1); }
     };
     const onTouchStart = (e) => { startY.current = e.touches[0].clientY; };
-    const onTouchEnd   = (e) => {
+    const onTouchEnd = (e) => {
         if (startY.current == null) return;
         const dy = startY.current - e.changedTouches[0].clientY;
         if (Math.abs(dy) > 10) go(idxRef.current + (dy > 0 ? 1 : -1));
         startY.current = null;
     };
-    const onMouseDown  = (e) => { startY.current = e.clientY; isDragging.current = false; };
-    const onMouseMove  = (e) => {
+    const onMouseDown = (e) => { startY.current = e.clientY; isDragging.current = false; };
+    const onMouseMove = (e) => {
         if (startY.current == null) return;
         const dy = startY.current - e.clientY;
         if (Math.abs(dy) > 18) {
@@ -101,7 +101,7 @@ const DrumScroller = ({ categories, activeId, onChange }) => {
     };
     const onMouseUp = () => { startY.current = null; };
 
-    const center  = boxH / 2;
+    const center = boxH / 2;
     const maxDist = Math.ceil(boxH / (2 * ITEM_PX)) + 1;
 
     return (
@@ -124,17 +124,17 @@ const DrumScroller = ({ categories, activeId, onChange }) => {
                 style={{ height: center * 0.6, background: "linear-gradient(to top, var(--color-background) 0%, transparent 100%)" }} />
 
             {categories.map((cat, i) => {
-                const dist    = i - idx;
-                const active  = dist === 0;
+                const dist = i - idx;
+                const active = dist === 0;
                 const absDist = Math.abs(dist);
                 if (absDist > maxDist) return null;
-                const top    = center + dist * ITEM_PX - ITEM_PX / 2;
+                const top = center + dist * ITEM_PX - ITEM_PX / 2;
                 const angleX = dist * ANGLE_DEG;
                 const blurPx = Math.min(absDist * 2, 7);
-                const opa    = active ? 1 : Math.max(0.08, 1 - absDist * 0.22);
-                const fSize  = active ? "1.05rem" : (Math.max(0.72, 0.98 - absDist * 0.13) + "rem");
-                const fw     = active ? 800 : 500;
-                const color  = active ? "#f2f4f7" : "#6b7280";
+                const opa = active ? 1 : Math.max(0.08, 1 - absDist * 0.22);
+                const fSize = active ? "1.05rem" : (Math.max(0.72, 0.98 - absDist * 0.13) + "rem");
+                const fw = active ? 800 : 500;
+                const color = active ? "#f2f4f7" : "#6b7280";
                 return (
                     <div key={cat.id} onClick={() => !isDragging.current && go(i)}
                         style={{
@@ -270,7 +270,7 @@ const ProjectCard = ({ project, idx, onLearnMore }) => (
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             {project.image ? (
                 <div className="w-full h-44 border-b border-white/10 relative overflow-hidden shrink-0">
-                    <img src={project.image} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <img src={project.image} alt={project.title} className={`w-full h-full object-cover transition-transform duration-700 ${project.image.includes('coming-soon') ? '' : 'group-hover:scale-105'}`} />
                     <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-transparent to-transparent" />
                 </div>
             ) : (

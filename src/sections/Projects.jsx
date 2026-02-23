@@ -65,22 +65,11 @@ const ProjectCard = ({ project, onLearnMore, index, isActive }) => {
       <div className="w-full h-40 sm:h-44 md:h-48 overflow-hidden relative border-b border-white/10 shrink-0 bg-zinc-950">
         <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-700 z-10 pointer-events-none" />
 
-        {(project.link === '#' && project.github === '#') ? (
-          /* ── Coming Soon CSS banner ── */
-          <div className="w-full h-full relative flex flex-col items-center justify-center bg-[#080d10]">
-            {/* grid */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#20b2a614_1px,transparent_1px),linear-gradient(to_bottom,#20b2a614_1px,transparent_1px)] bg-[size:28px_28px]" />
-            {/* teal glow */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-primary/30 blur-[40px] rounded-full" />
-            {/* content */}
-            <span className="relative z-10 text-2xl mb-1" role="img" aria-label="rocket">🚀</span>
-            <span className="relative z-10 text-sm font-bold tracking-[0.3em] uppercase text-white/90" style={{ fontFamily: 'var(--font-heading)' }}>Coming Soon</span>
-          </div>
-        ) : project.image ? (
+        {project.image ? (
           <motion.img
             src={project.image}
             alt={project.title}
-            className="w-full h-full object-cover transform origin-center scale-105 group-hover:scale-110 transition-transform duration-1000 ease-[0.21,0.47,0.32,0.98]"
+            className={`w-full h-full object-cover transform origin-center ${project.image.includes('coming-soon') ? '' : 'scale-105 group-hover:scale-110'} transition-transform duration-1000 ease-[0.21,0.47,0.32,0.98]`}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-950 to-black">

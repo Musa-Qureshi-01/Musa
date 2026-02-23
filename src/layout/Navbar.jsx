@@ -73,7 +73,7 @@ export const Navbar = () => {
             />
           ) : (
             <>
-              Musa<span className="text-primary text-4xl">.</span>
+              M<span className="text-primary text-4xl">.</span>
             </>
           )}
         </Link>
