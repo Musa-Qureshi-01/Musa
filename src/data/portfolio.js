@@ -277,7 +277,7 @@ export const portfolioData = {
         {
             name: "OCI Generative AI Professional",
             issuer: "Oracle Cloud Infrastructure",
-            period: "Jan 2025 \u2014 Mar 2025",
+            period: "Sep 2025",
         },
     ],
     editorial: {
