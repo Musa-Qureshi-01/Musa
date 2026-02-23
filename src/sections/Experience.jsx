@@ -32,18 +32,19 @@ export const Experience = () => {
 
         {/* Timeline */}
         <div className="relative">
-          <div className="timeline-glow absolute left-0 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-primary/70 via-primary/30 to-transparent md:-translate-x-1/2 shadow-[0_0_25px_rgba(32,178,166,0.8)]" />
+          {/* The vertical line — left on mobile, centered on md+ */}
+          <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-primary/70 via-primary/30 to-transparent md:-translate-x-1/2 shadow-[0_0_25px_rgba(32,178,166,0.8)]" />
 
           {/* Experience Items */}
-          <div className="flex flex-col pb-8">
+          <div className="flex flex-col gap-10 md:gap-0 pb-8">
             {experience.map((exp, idx) => (
               <ScrollReveal key={idx} delay={idx * 0.1}>
                 <div
-                  className={`relative grid md:grid-cols-2 gap-8 ${idx > 0 ? "mt-12 md:-mt-12 lg:-mt-24" : ""
+                  className={`relative md:grid md:grid-cols-2 md:gap-8 ${idx > 0 ? "md:-mt-16 lg:-mt-24" : ""
                     }`}
                 >
                   {/* Timeline Dot */}
-                  <div className="absolute left-0 md:left-1/2 top-0 w-3 h-3 bg-primary rounded-full -translate-x-1/2 ring-4 ring-background z-10">
+                  <div className="absolute left-[9px] md:left-1/2 top-6 md:top-0 w-3 h-3 bg-primary rounded-full md:-translate-x-1/2 ring-4 ring-background z-10">
                     {idx === 0 && (
                       <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
                     )}
@@ -51,30 +52,27 @@ export const Experience = () => {
 
                   {/* Content */}
                   <div
-                    className={`pl-8 md:pl-0 ${idx % 2 === 0
+                    className={`pl-10 md:pl-0 ${idx % 2 === 0
                       ? "md:pr-16 md:text-right"
                       : "md:col-start-2 md:pl-16"
                       }`}
                   >
-                    <div
-                      className="bg-white/[0.02] p-6 md:p-8 rounded-3xl border border-white/10 hover:border-primary/30 hover:bg-white/[0.04] transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 group relative overflow-hidden"
-                    >
+                    <div className="bg-white/[0.02] p-5 md:p-8 rounded-3xl border border-white/10 hover:border-primary/30 hover:bg-white/[0.04] transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 group relative overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                       <div className="relative z-10">
                         <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wide mb-3">
                           {exp.period}
                         </span>
-                        <h3 className="text-2xl font-bold mb-1">{exp.role}</h3>
-                        <p className="text-lg text-muted-foreground font-medium mb-6">{exp.company}</p>
+                        <h3 className="text-xl md:text-2xl font-bold mb-1">{exp.role}</h3>
+                        <p className="text-base text-muted-foreground font-medium mb-5">{exp.company}</p>
 
                         <div className="text-left space-y-4">
-                          <p className="text-zinc-300 leading-relaxed font-body text-sm md:text-base">
+                          <p className="text-zinc-300 leading-relaxed font-body text-sm">
                             {exp.description}
                           </p>
-                          <div className="space-y-6">
+                          <div className="space-y-4">
                             {exp.achievements.map((achievement, aIdx) => {
-                              // Handle complex sectioned achievements (e.g., Current Focus, Background)
                               if (typeof achievement === "object" && achievement.title) {
                                 return (
                                   <div key={aIdx} className="space-y-2">
@@ -90,8 +88,6 @@ export const Experience = () => {
                                   </div>
                                 );
                               }
-
-                              // Handle standard string achievements
                               return (
                                 <ul key={aIdx} className="space-y-2">
                                   <li className="flex items-start gap-3 text-sm text-zinc-400 font-body">
@@ -111,6 +107,8 @@ export const Experience = () => {
             ))}
           </div>
         </div>
+
+
       </div>
     </section>
   );

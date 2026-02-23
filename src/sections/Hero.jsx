@@ -33,8 +33,8 @@ export const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Bg */}
-      <div className="absolute inset-0">
+      {/* Bg — hidden on mobile to keep text crisp */}
+      <div className="absolute inset-0 hidden sm:block">
         <img
           src="/hero-bg.jpg"
           alt="Hero background"
@@ -57,7 +57,7 @@ export const Hero = () => {
             </FadeIn>
 
             {/* Middle: Animated Role Text */}
-            <div className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-foreground mt-4">
+            <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-foreground mt-4">
               <div className="text-foreground flex items-center h-[1.3em]">
                 <FlipText
                   phrases={["AI Engineer", "Agentic Developer", "Data Scientist"]}
@@ -66,72 +66,66 @@ export const Hero = () => {
             </div>
 
             {/* Bottom: Tagline with Wipe Animation */}
-            <div className="pt-2">
+            <div className="pt-2 flex flex-col gap-1">
               <LetterReveal
-                text="Building intelligent systems at the intersection of data, algorithms, and practical engineering."
+                text="Building production-grade intelligent systems."
                 className="text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed font-body"
                 delay={0.2}
               />
+              <LetterReveal
+                text="Designed, shipped, and refined under real-world constraints."
+                className="text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed font-body"
+                delay={0.4}
+              />
             </div>
 
-            {/* CTAs (Baseline Aligned) */}
-            <div className="flex flex-row items-center gap-4 pt-6 animate-fade-in animation-delay-300">
-              <Button size="lg" className="rounded-full px-8 h-12 flex items-center justify-center" onClick={() => document.getElementById('contact').scrollIntoView()}>
+            {/* CTAs */}
+            <div className="flex flex-wrap items-center gap-3 pt-6 animate-fade-in animation-delay-300">
+              <Button size="lg" className="rounded-full px-6 h-12 flex items-center justify-center" onClick={() => document.getElementById('contact').scrollIntoView()}>
                 Contact Me <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <div
-                className="relative z-50 w-full md:w-auto flex items-center cv-shimmer-border rounded-full transition-all"
-                ref={dropdownRef}
-              >
-                {/* Main CV button — downloads Agentic Developer directly */}
-                <a
-                  href="/assets/Musa Qureshi _Agentic Developer_.pdf"
-                  download="Musa_Qureshi_Agentic_Developer_CV.pdf"
-                  className="flex-1 h-12 pl-6 pr-4 flex items-center justify-center text-sm font-semibold text-foreground hover:text-primary transition-colors rounded-l-full"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download CV
-                </a>
-
-                {/* Arrow toggle */}
+              <div className="relative z-50" ref={dropdownRef}>
+                {/* Main CV button */}
                 <button
                   onClick={() => setIsCVOpen(!isCVOpen)}
-                  className="h-12 w-12 flex items-center justify-center border-l border-white/10 hover:bg-white/5 rounded-r-full transition-colors flex-shrink-0"
-                  aria-label="Other resume versions"
+                  className="h-12 px-6 flex items-center gap-2 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-foreground text-sm font-semibold transition-all cv-shimmer-border"
                 >
-                  <ChevronDown className={`w-4 h-4 opacity-70 transition-transform duration-300 ${isCVOpen ? 'rotate-180' : ''}`} />
+                  <Download className="w-4 h-4" />
+                  Download CV
+                  <ChevronDown className={`w-4 h-4 opacity-60 transition-transform duration-300 ${isCVOpen ? "rotate-180" : ""}`} />
                 </button>
 
-                {/* Dropdown panel — click-only, framer-motion animated */}
+                {/* Dropdown */}
                 {isCVOpen && (
                   <motion.div
                     initial={{ opacity: 0, y: -8, scale: 0.97 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                    className="absolute top-[calc(100%+0.75rem)] left-0 w-full min-w-[220px] bg-[#0d1117] border border-white/10 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden z-[100]"
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.16, ease: "easeOut" }}
+                    className="absolute top-[calc(100%+0.6rem)] left-0 w-56 bg-[#0d1117] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-[100]"
                   >
-                    {/* Shimmer top accent */}
-                    <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-                    <div className="p-2 flex flex-col gap-1">
+                    <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+                    <div className="p-1.5 flex flex-col">
                       {[
-                        { label: 'Agentic Developer', file: 'Musa Qureshi _Agentic Developer_.pdf', download: 'Musa_Qureshi_Agentic_Developer_CV.pdf' },
-                        { label: 'Data Scientist', file: 'Musa Qureshi _ Data Scientist.pdf', download: 'Musa_Qureshi_Data_Scientist_CV.pdf' },
-                        { label: 'AI Engineer', file: 'Musa Qureshi _AI Engineer_.pdf', download: 'Musa_Qureshi_AI_Engineer_CV.pdf' },
-                      ].map(({ label, file, download: dl }) => (
+                        { label: "Agentic Developer", file: "Musa_Qureshi_Agentic_Developer.pdf" },
+                        { label: "Data Scientist", file: "Musa_Qureshi_Data_Scientist.pdf" },
+                        { label: "AI Engineer", file: "Musa_Qureshi_AI_Engineer.pdf" },
+                      ].map(({ label, file }) => (
                         <a
                           key={label}
                           href={`/assets/${file}`}
-                          download={dl}
+                          download={file}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           onClick={() => setIsCVOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm text-zinc-300 hover:text-foreground hover:bg-white/5 transition-colors group"
+                          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/5 transition-colors group"
                         >
-                          <Download className="w-3.5 h-3.5 text-zinc-500 group-hover:text-primary transition-colors flex-shrink-0" />
-                          <span className="font-medium">{label}</span>
+                          <Download className="w-3.5 h-3.5 text-zinc-600 group-hover:text-primary flex-shrink-0" />
+                          {label}
                         </a>
                       ))}
                     </div>
-                    <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                    <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/5 to-transparent" />
                   </motion.div>
                 )}
               </div>
@@ -157,8 +151,8 @@ export const Hero = () => {
             </div>
           </div>
 
-          {/* Right Column - Profile Image (clean matching) */}
-          <div className="lg:col-span-5 relative animate-fade-in flex justify-center lg:justify-end">
+          {/* Right Column - Profile Image — hidden on mobile */}
+          <div className="hidden lg:flex lg:col-span-5 relative animate-fade-in justify-end">
             <div className="relative w-full max-w-[280px] md:max-w-[340px] xl:max-w-[380px] aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-white/10 hover:border-primary/50 transition-all duration-500 hover:shadow-primary/10 group bg-card">
 
               {/* Continuous Animated SVG Border around Picture Container */}

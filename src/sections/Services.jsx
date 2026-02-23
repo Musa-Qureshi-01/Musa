@@ -6,22 +6,22 @@ const services = [
     {
         icon: Layers,
         title: "FSD SaaS Builder",
-        description: "End-to-end Feature-Sliced Design (FSD) architecture for scalable, maintainable SaaS products.",
+        description: "Designing and delivering feature-sliced, end-to-end SaaS systems — from architecture and APIs to frontend, data, and deployment — built for scale, maintainability, and real-world use.",
     },
     {
         icon: BrainCircuit,
         title: "Agentic/Generative AI",
-        description: "Building autonomous agents using LangGraph and LLMs, creating custom tools and workflows.",
+        description: "Building LLM-powered and agentic systems using LangGraph and modern AI stacks, including RAG pipelines, tool orchestration, and autonomous workflows that operate reliably in production.",
     },
     {
         icon: Database,
         title: "ML/DL Engineering",
-        description: "End-to-end model training, building, evaluation, and reliable MLOps pipelines.",
+        description: "Developing end-to-end machine learning systems, covering data pipelines, model training and evaluation, and production-grade MLOps pipelines for reliable deployment and iteration.",
     },
     {
         icon: BookOpen,
         title: "Research & Mentorship",
-        description: "Deep dive studies, technical writing, and guiding aspiring engineers in AI and full-stack development.",
+        description: "Conducting deep technical exploration and applied research, supported by technical writing and mentorship — helping engineers understand systems deeply and apply AI effectively.",
     },
 ];
 

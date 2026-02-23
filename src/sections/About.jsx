@@ -159,9 +159,9 @@ export const About = () => {
                 <div>
                   <div className="flex items-center gap-2.5 mb-4">
                     <Award className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-                    <span className="text-xs font-semibold tracking-widest uppercase text-zinc-400">Certification</span>
+                    <span className="text-xs font-semibold tracking-widest uppercase text-zinc-400">Professional Certifications</span>
                   </div>
-                  <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {certifications.map((cert, i) => (
                       <div key={i} className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4 hover:border-amber-400/20 transition-colors min-h-[110px]">
                         <div className="flex items-start justify-between gap-3 mb-1">

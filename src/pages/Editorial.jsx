@@ -37,7 +37,7 @@ export const Editorial = () => {
                             </Link>
 
                             {/* Title — centered in the full row */}
-                            <GlitchText text="Editorial Hub." className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center font-heading text-foreground" delay={0.1} />
+                            <GlitchText text="Editorial Hub." className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center font-heading text-foreground" delay={0.1} />
                         </div>
                         <ScrollReveal delay={0.2}>
                             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto text-center font-body italic">

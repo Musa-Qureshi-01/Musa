@@ -49,7 +49,7 @@ export const Testimonials = () => {
     );
   };
   return (
-    <section id="testimonials" className="section-padding relative overflow-hidden">
+    <section id="testimonials" className="section-padding relative overflow-hidden hidden md:block">
       <div
         className="absolute top-1/2 left-1/2
        w-[800px] h-[800px] bg-primary/5

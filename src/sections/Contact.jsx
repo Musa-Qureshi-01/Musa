@@ -116,10 +116,10 @@ export const Contact = () => {
           </ScrollReveal>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 max-w-6xl mx-auto">
           <FadeIn delay={0.3} className="h-full">
             <div className="bg-white/[0.02] p-6 md:p-8 rounded-3xl border border-white/10 shadow-lg h-full flex flex-col relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               <form className="space-y-6 relative z-10" onSubmit={handleSubmit}>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -195,13 +195,13 @@ export const Contact = () => {
                 )}
               </form>
 
-              <div className="mt-8 pt-8 border-t border-white/10 text-center">
+              <div className="mt-8 pt-8 border-t border-white/10 text-center relative z-20">
                 <p className="text-sm text-muted-foreground mb-4">Prefer a direct conversation?</p>
                 <a
                   href="https://cal.com/musa-qureshi-01/15min"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-white/5 border border-white/10 hover:border-primary/50 hover:bg-white/10 text-foreground font-medium transition-all group"
+                  className="inline-flex w-full sm:w-auto items-center justify-center h-12 px-8 rounded-full bg-white/5 border border-white/10 hover:border-primary/50 hover:bg-white/10 text-foreground font-medium transition-all group"
                 >
                   Book a 15-min Meeting
                   <Phone className="w-4 h-4 ml-2 opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -230,7 +230,7 @@ export const Contact = () => {
                         <div className="text-sm text-muted-foreground font-medium mb-1">
                           {item.label}
                         </div>
-                        <div className="font-semibold text-lg">{item.value}</div>
+                        <div className="font-semibold text-sm sm:text-base break-all">{item.value}</div>
                       </div>
                     </a>
                   ))}
