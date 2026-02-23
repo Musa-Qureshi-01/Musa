@@ -115,8 +115,8 @@ const DrumScroller = ({ categories, activeId, onChange }) => {
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
             onMouseLeave={onMouseUp}
-            className="relative select-none outline-none w-full flex-1"
-            style={{ cursor: "ns-resize", perspective: "600px", perspectiveOrigin: "50% 50%", overflow: "hidden", minHeight: 0 }}
+            className="relative select-none outline-none w-full h-full"
+            style={{ cursor: "ns-resize", perspective: "600px", perspectiveOrigin: "50% 50%", overflow: "hidden" }}
         >
             <div className="pointer-events-none absolute inset-x-0 top-0 z-10"
                 style={{ height: center * 0.6, background: "linear-gradient(to bottom, var(--color-background) 0%, transparent 100%)" }} />
@@ -127,7 +127,7 @@ const DrumScroller = ({ categories, activeId, onChange }) => {
                 const dist = i - idx;
                 const active = dist === 0;
                 const absDist = Math.abs(dist);
-                if (absDist > maxDist) return null;
+                if (boxH > 100 && absDist > maxDist) return null;
                 const top = center + dist * ITEM_PX - ITEM_PX / 2;
                 const angleX = dist * ANGLE_DEG;
                 const blurPx = Math.min(absDist * 2, 7);
@@ -330,7 +330,7 @@ export const ProjectsPage = () => {
                     <div className="px-6 pb-2 flex-shrink-0">
                         <p className="text-[9px] font-bold tracking-[0.22em] uppercase text-zinc-600">Categories</p>
                     </div>
-                    <div className="flex-1 flex items-center overflow-hidden">
+                    <div className="flex-1 w-full overflow-hidden relative">
                         <DrumScroller categories={CATEGORIES} activeId={activeId} onChange={setActiveId} />
                     </div>
                     <p className="flex-shrink-0 text-[9px] text-zinc-700 text-center tracking-widest py-5">scroll or drag</p>
