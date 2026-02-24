@@ -3,6 +3,7 @@ import { Github, Code2, GitFork, Star, CalendarDays } from "lucide-react";
 import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
 import { portfolioData } from "@/data/portfolio";
 import { GitHubCalendar } from 'react-github-calendar';
+
 import { LetterReveal, ScrollReveal } from "@/components/TextAnimations";
 import { FadeIn } from "@/components/Reveal";
 
@@ -22,6 +23,7 @@ const AnimatedNumber = ({ value, loading, suffix = "" }) => {
 
     return <span ref={ref}>{loading ? "—" : display.toLocaleString()}{suffix}</span>;
 };
+
 
 // ── Difficulty bar ────────────────────────────────────────────────
 const DiffBar = ({ label, solved, total, color, beats, loading, delay = 0 }) => {
@@ -58,7 +60,7 @@ export const Stats = () => {
         easy: 0, totalEasy: 927, easyBeats: 0,
         medium: 0, totalMedium: 2010, mediumBeats: 0,
         hard: 0, totalHard: 909, hardBeats: 0,
-        activeDays: 0,
+        activeDays: 0, submissionCalendar: "{}",
     });
     const [loading, setLoading] = useState(true);
 
@@ -75,12 +77,12 @@ export const Stats = () => {
                     fetch(`https://alfa-leetcode-api.onrender.com/${leetcodeUsername}/calendar`),
                 ]);
                 if (ghRes.ok) {
-                    const d = await ghRes.json();
-                    setGithubStats({ followers: d.followers, public_repos: d.public_repos });
+                    const d = await ghRes.json().catch(() => ({}));
+                    setGithubStats({ followers: d.followers || 0, public_repos: d.public_repos || 0 });
                 }
-                const lcProfile = lcProfileRes.ok ? await lcProfileRes.json() : {};
-                const lcSolved = lcSolvedRes.ok ? await lcSolvedRes.json() : {};
-                const lcCal = lcCalRes.ok ? await lcCalRes.json() : {};
+                const lcProfile = lcProfileRes.ok ? await lcProfileRes.json().catch(() => ({})) : {};
+                const lcSolved = lcSolvedRes.ok ? await lcSolvedRes.json().catch(() => ({})) : {};
+                const lcCal = lcCalRes.ok ? await lcCalRes.json().catch(() => ({})) : {};
                 setLeetcodeStats({
                     solvedCount: lcSolved.solvedProblem || lcProfile.totalSolved || 0,
                     totalQuestions: lcProfile.totalQuestions || 3846,
@@ -94,12 +96,14 @@ export const Stats = () => {
                     totalHard: lcProfile.totalHard || 909,
                     hardBeats: Math.round(lcProfile.hardBeatsPercent || 0),
                     activeDays: lcCal.totalActiveDays || 0,
+                    submissionCalendar: lcCal.submissionCalendar || "{}",
                 });
             } catch (e) { console.error(e); }
             finally { setLoading(false); }
         };
         fetch_();
     }, [githubUsername, leetcodeUsername]);
+
 
     const solvedPct = leetcodeStats.totalQuestions > 0
         ? (leetcodeStats.solvedCount / leetcodeStats.totalQuestions) * 100 : 0;
@@ -278,6 +282,8 @@ export const Stats = () => {
                                 solved={leetcodeStats.hard} total={leetcodeStats.totalHard}
                                 beats={leetcodeStats.hardBeats} loading={loading} delay={0.6} />
                         </div>
+
+
 
                         {/* Summary footer */}
                         <div className="pt-3 border-t border-white/5 grid grid-cols-2 gap-3 mt-auto">

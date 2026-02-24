@@ -255,8 +255,8 @@ export const ProjectsPage = () => {
                         <VerticalCategoryNav categories={CATEGORIES} activeId={activeId} onChange={setActiveId} />
                     </div>
 
-                    <div className="p-6 border-t border-white/5 bg-zinc-950/20 text-center">
-                        <p className="text-[10px] text-zinc-600 font-medium tracking-tight">Select a category to filter projects</p>
+                    <div className="h-40 flex items-center justify-center border-t border-white/5 bg-white/[0.01]">
+                        <p className="text-zinc-500 text-sm">Select a category to filter projects</p>
                     </div>
                 </aside>
 
@@ -267,7 +267,9 @@ export const ProjectsPage = () => {
 
                     {/* mobile pills */}
                     <div className="flex md:hidden flex-wrap gap-2 mb-8">
-                        <Link to="/" className="w-full inline-flex items-center gap-1.5 text-zinc-500 hover:text-primary text-xs mb-2"><ArrowLeft className="w-3.5 h-3.5" /> Back</Link>
+                        <Link to="/" className="w-full inline-flex items-center gap-1.5 text-zinc-500 hover:text-primary text-xs mb-2">
+                            <ArrowLeft className="w-3.5 h-3.5" /> Back
+                        </Link>
                         {CATEGORIES.map(cat => (
                             <button key={cat.id} onClick={() => setActiveId(cat.id)}
                                 className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${activeId === cat.id ? "bg-primary text-primary-foreground" : "bg-white/5 text-zinc-400 hover:bg-white/10"}`}>

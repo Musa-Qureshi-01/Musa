@@ -325,12 +325,12 @@ export const portfolioData = {
         publications: [
             {
                 id: 1,
-                title: "Optimizing YOLOv8 for Real-Time Edge Inference: Quantization, ONNX Export & Latency Analysis",
-                summary: "An empirical study on deploying YOLOv8n-seg to CPU-constrained environments via INT8 quantization and ONNX Runtime, achieving sub-200ms inference with <3% mAP loss.",
+                title: "Applied AI Systems Research",
+                summary: "Researching and building platform-agnostic Full-Stack AI Agents capable of operating across diverse environments to autonomously plan, execute, observe, and improve multi-step tasks. Implemented corrective execution loops, observability, and long-term memory for continuous performance improvement.",
                 platform: "Research",
                 platformLogo: null,
                 link: "#",
-                date: "2026-01-05",
+                date: "2026-02-01", // Representing Feb 2026
             },
         ],
     },

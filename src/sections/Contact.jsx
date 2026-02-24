@@ -105,7 +105,7 @@ export const Contact = () => {
           </ScrollReveal>
 
           <div className="mt-4 mb-6">
-            <LetterReveal text="Let's build something great." className="text-3xl md:text-4xl font-bold text-foreground font-heading" />
+            <LetterReveal text="Let's build something great." className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground font-heading" />
           </div>
 
           <ScrollReveal delay={0.2}>
@@ -130,7 +130,7 @@ export const Contact = () => {
                       id="name"
                       type="text"
                       required
-                      placeholder="John Doe"
+                      placeholder={portfolioData.personalInfo.name}
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-4 py-3 bg-white/5 rounded-xl border border-white/10 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all placeholder:text-muted-foreground/30"
@@ -144,7 +144,7 @@ export const Contact = () => {
                       id="email"
                       type="email"
                       required
-                      placeholder="john@example.com"
+                      placeholder={portfolioData.personalInfo.email}
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full px-4 py-3 bg-white/5 rounded-xl border border-white/10 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all placeholder:text-muted-foreground/30"

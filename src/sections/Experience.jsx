@@ -21,7 +21,7 @@ export const Experience = () => {
             </span>
           </ScrollReveal>
           <div className="mt-4 mb-6">
-            <LetterReveal text="Building systems that scale." className="text-3xl md:text-4xl font-bold text-foreground font-heading" />
+            <LetterReveal text="Building systems that scale." className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground font-heading" />
           </div>
           <ScrollReveal delay={0.2}>
             <p className="text-zinc-400">

@@ -63,7 +63,7 @@ export const About = () => {
           <div className="mt-4 mb-3">
             <LetterReveal
               text="Engineering intelligence,"
-              className="text-3xl md:text-4xl font-bold text-foreground font-heading"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground font-heading"
             />
           </div>
           <FadeIn delay={0.2}>

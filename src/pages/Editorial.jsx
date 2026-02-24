@@ -29,15 +29,15 @@ export const Editorial = () => {
 
                     {/* Header — back button left, title centered, same row */}
                     <div className="mb-10 w-full pt-2">
-                        <div className="relative flex items-center justify-center min-h-[56px] mb-6">
-                            {/* Back button — pinned to left */}
-                            <Link to="/" className="absolute left-0 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group bg-white/5 px-4 py-2 rounded-full border border-white/5 hover:border-primary/20">
+                        <div className="relative flex flex-col md:flex-row items-center justify-center min-h-[56px] mb-6 gap-4 md:gap-0">
+                            {/* Back button — pinned to left on desktop, centered on mobile */}
+                            <Link to="/" className="md:absolute md:left-0 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group bg-white/5 px-4 py-2 rounded-full border border-white/5 hover:border-primary/20 shrink-0">
                                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                                 Back to Portfolio
                             </Link>
 
                             {/* Title — centered in the full row */}
-                            <GlitchText text="Editorial Hub." className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center font-heading text-foreground" delay={0.1} />
+                            <GlitchText text="Editorial Hub." className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center font-heading text-foreground" delay={0.1} />
                         </div>
                         <ScrollReveal delay={0.2}>
                             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto text-center font-body italic">

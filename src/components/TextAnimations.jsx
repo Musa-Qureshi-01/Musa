@@ -65,6 +65,8 @@ export const LetterReveal = ({ text, className = "", delay = 0 }) => {
         },
     };
 
+    const words = text.split(" ");
+
     return (
         <motion.h2
             ref={ref}
@@ -73,10 +75,14 @@ export const LetterReveal = ({ text, className = "", delay = 0 }) => {
             animate={controls}
             className={`inline-block ${className}`}
         >
-            {text.split("").map((char, index) => (
-                <motion.span key={index} variants={child} className="inline-block">
-                    {char === " " ? "\u00A0" : char}
-                </motion.span>
+            {words.map((word, wordIndex) => (
+                <span key={wordIndex} className="inline-block whitespace-nowrap mr-[0.25em]">
+                    {word.split("").map((char, charIndex) => (
+                        <motion.span key={charIndex} variants={child} className="inline-block">
+                            {char}
+                        </motion.span>
+                    ))}
+                </span>
             ))}
         </motion.h2>
     );

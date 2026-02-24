@@ -56,7 +56,7 @@ export const Navbar = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 transition-all duration-500 ${isScrolled ? "bg-background/80 backdrop-blur-md border-b border-white/5 py-4" : "bg-transparent py-6"
+      className={`fixed top-0 left-0 right-0 transition-all duration-500 ${isScrolled || isMobileMenuOpen ? "bg-background/80 backdrop-blur-md border-b border-white/5 py-4" : "bg-transparent py-6"
         }  z-50`}
     >
       <nav className="container-responsive flex items-center justify-between">
@@ -121,7 +121,7 @@ export const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-background border-b border-border animate-fade-in shadow-2xl">
+        <div className="md:hidden absolute top-full left-0 w-full h-[calc(100vh-70px)] bg-background border-b border-white/5 animate-fade-in shadow-2xl overflow-y-auto pb-8">
           <div className="container mx-auto px-6 py-8 flex flex-col gap-6">
             {navLinks.map((link, index) => (
               <Link

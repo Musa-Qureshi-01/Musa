@@ -356,7 +356,7 @@ export const Projects = () => {
           </ScrollReveal>
 
           <div className="mt-4 mb-4">
-            <LetterReveal text="Systems that demonstrate depth." className="text-3xl md:text-5xl font-bold text-white font-heading" />
+            <LetterReveal text="Systems that demonstrate depth." className="text-2xl sm:text-4xl md:text-5xl font-bold text-white font-heading" />
           </div>
 
           <ScrollReveal delay={0.2}>
