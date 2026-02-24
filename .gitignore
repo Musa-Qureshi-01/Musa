@@ -1,4 +1,6 @@
+# ======================
 # Logs
+# ======================
 logs
 *.log
 npm-debug.log*
@@ -7,26 +9,39 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# ======================
+# Dependencies & Builds
+# ======================
+node_modules/
+dist/
+dist-ssr/
 *.local
-.env
-.env.local
 
-# Editor directories and files
+# ======================
+# Environment Variables
+# ======================
+.env
+.env.*
+!.env.example
+
+# ======================
+# Firebase (CRITICAL)
+# ======================
+.firebase/
+firebase-credentials.json
+firebase-admin.json
+serviceAccountKey.json
+**/*firebase*.json
+
+# ======================
+# Editor & OS files
+# ======================
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-
-# Firebase Credentials
-firebase-credentials.json
-firebase-admin.json
-serviceAccountKey.json
-*.firebase*.json
