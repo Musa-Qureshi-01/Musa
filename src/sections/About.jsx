@@ -25,7 +25,6 @@ const HIGHLIGHTS = [
   "Musa Qureshi",
   "AI engineering",
   "agentic systems",
-  "quantitative research",
 ];
 
 const highlightBio = (text) => {

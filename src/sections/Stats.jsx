@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Github, Code2, GitFork, Star, CalendarDays } from "lucide-react";
+import { Github, Code2, GitFork, Star, CalendarDays, Trophy, TrendingUp, Swords } from "lucide-react";
 import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
 import { portfolioData } from "@/data/portfolio";
 import { GitHubCalendar } from 'react-github-calendar';
@@ -137,9 +137,9 @@ export const Stats = () => {
                     </FadeIn>
                 </div>
 
-                {/* ── Two records side-by-side ── */}
+                {/* ── Three cards side-by-side on desktop ── */}
                 <motion.div
-                    className="grid md:grid-cols-2 gap-6"
+                    className="grid md:grid-cols-3 gap-6"
                     initial={{ opacity: 0, y: 20 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
@@ -301,6 +301,77 @@ export const Stats = () => {
                             </div>
                         </div>
                     </div>
+                    {/* ═══ Codeforces Card ═══════════════════════════════════ */}
+                    <div className="bg-white/[0.02] rounded-2xl border border-white/[0.07] p-6 flex flex-col gap-5 hover:border-white/[0.12] transition-colors group/cf">
+
+                        {/* Identity row */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                                    <Swords className="w-5 h-5 text-purple-400" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-bold text-foreground leading-none">Codeforces</p>
+                                    <a href="https://codeforces.com/profile/Musa_Qureshi" target="_blank" rel="noopener noreferrer"
+                                        className="text-[11px] text-zinc-500 hover:text-purple-400 transition-colors">
+                                        @Musa_Qureshi
+                                    </a>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[10px] text-emerald-400">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                Active
+                            </div>
+                        </div>
+
+                        {/* Rating ring */}
+                        <div className="flex flex-col items-center justify-center gap-2 py-4">
+                            <div className="relative w-[80px] h-[80px] flex items-center justify-center">
+                                <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 80 80">
+                                    <circle cx="40" cy="40" r="32" className="stroke-white/5 fill-none" strokeWidth="5" />
+                                    <motion.circle
+                                        cx="40" cy="40" r="32"
+                                        className="stroke-purple-500 fill-none"
+                                        strokeWidth="5"
+                                        strokeLinecap="round"
+                                        strokeDasharray={circumference}
+                                        initial={{ strokeDashoffset: circumference }}
+                                        animate={isInView ? { strokeDashoffset: circumference * (1 - 1100 / 3500) } : {}}
+                                        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
+                                    />
+                                </svg>
+                                <div className="flex flex-col items-center justify-center z-10">
+                                    <span className="text-base font-bold font-mono text-foreground leading-none">1100+</span>
+                                    <span className="text-[9px] text-zinc-500 mt-0.5 uppercase tracking-wider">Rating</span>
+                                </div>
+                            </div>
+                            <p className="text-[11px] text-zinc-500 text-center">Pupil · Competitive programming</p>
+                        </div>
+
+                        {/* Stats grid */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5 text-center">
+                                <div className="flex items-center justify-center gap-1 text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5">
+                                    <Trophy className="w-3 h-3 text-purple-500/60" /> Rank
+                                </div>
+                                <p className="text-base font-bold font-mono text-purple-400">Pupil</p>
+                            </div>
+                            <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5 text-center">
+                                <div className="flex items-center justify-center gap-1 text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5">
+                                    <TrendingUp className="w-3 h-3 text-purple-500/60" /> Max
+                                </div>
+                                <p className="text-base font-bold font-mono text-foreground">1100+</p>
+                            </div>
+                        </div>
+
+                        {/* Divider + note */}
+                        <div className="pt-3 border-t border-white/5">
+                            <p className="text-[11px] text-zinc-600 text-center leading-relaxed">
+                                Actively solving algorithmic problems to strengthen DSA fundamentals
+                            </p>
+                        </div>
+                    </div>
+
 
                 </motion.div>
             </div>

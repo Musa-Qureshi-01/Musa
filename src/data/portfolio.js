@@ -1,4 +1,4 @@
-﻿
+
 export const portfolioData = {
     personalInfo: {
         name: "Musa Qureshi",
@@ -14,9 +14,9 @@ export const portfolioData = {
             hackerearth: "https://www.hackerearth.com/@musaqureshi0000/",
             portfolio: "#",
         },
-        bio: "Hi, I'm Musa Qureshi \u2014 a Computer Science student specializing in AI engineering, agentic systems, and quantitative research. I build intelligent software that solves real problems.\n\nI learn by building end-to-end systems, not just models. My focus is on taking ideas from algorithms and data all the way to deployed applications that work reliably in production.\n\nMy work emphasizes engineering depth over buzzwords \u2014 strong fundamentals, clean system design, and practical decision-making under real-world constraints. Through this approach, I've developed solid experience across ML pipelines, system architecture, API and Agent development, and deployment workflows.\n\nI'm looking for internship, entry-level, or research roles where I can design, ship, and improve production-grade AI systems while deepening my expertise in machine learning, agentic systems, and quantitative methods.",
+        bio: "Hi, I'm Musa Qureshi \u2014 a Computer Science student specializing in AI engineering and agentic systems. I build intelligent software that solves real problems.\n\nI learn by building end-to-end systems, not just models. My focus is on taking ideas from algorithms and data all the way to deployed applications that work reliably in production.\n\nMy work emphasizes engineering depth over buzzwords \u2014 strong fundamentals, clean system design, and practical decision-making under real-world constraints. Through this approach, I've developed solid experience across ML pipelines, system architecture, API and Agent development, and deployment workflows.\n\nI'm looking for internship, entry-level, or research roles where I can design, ship, and improve production-grade AI systems while deepening my expertise in machine learning and agentic systems.",
         tagline: "Building intelligent agents and production-grade AI systems.",
-        flipWords: ["AI Engineer", "Agentic Developer", "Quant Researcher"],
+        flipWords: ["AI Engineer", "Top 1% Engineer", "Data Scientist"],
     },
     skills: {
         development: [
@@ -125,16 +125,17 @@ export const portfolioData = {
             image: "/assets/Care Grid -- Banner.png",
             highlights: [
                 "Engineered an agent-driven AI system to automate provider data validation, reducing manual QA effort by ~60%.",
-                "Improved data accuracy and audit readiness by ~40% using agent-driven workflows with confidence scoring.",
+                "Engineered an agent-driven AI system to automate provider data validation, reducing manual QA effort.",
+                "Improved data accuracy and audit readiness using agent-driven workflows with confidence scoring.",
                 "Established batch-processing pipelines and an analytics dashboard for faster provider review and escalation.",
             ],
         },
         {
             id: 4,
-            title: "BLOG.IO",
-            category: "GenAI & Content",
+            title: "EDITORIAL.IO",
+            category: "Agentic Content Platform",
             image: "/assets/coming-soon.png",
-            description: "Agentic Blog Automation System. A deterministic content engine that uses LLMs for research, planning, and drafting, while separate agents handle SEO auditing and scheduling.",
+            description: "Agentic Content Platform. A deterministic content engine that uses LLMs for research, planning, and drafting, while separate agents handle SEO auditing and scheduling.",
             tech: ["Next.js", "Clerk", "FastAPI", "Redis", "LangGraph"],
             link: "#",
             github: "#",
@@ -263,16 +264,16 @@ export const portfolioData = {
     education: [
         {
             degree: "Bachelor of Technology in Computer Science",
-            school: "Bansal Group of Institutes (RGPV)",
+            school: "Bansal Group of Institutes (Affiliated by RGPV)",
             year: "2023 - 2027",
-            details: "Relevent Coursework: Software Engineering, OS, OOPs, Data Structures & Algorithms. Cumulative GPA: 7.76/10",
+            details: "Relevant Coursework: Software Engineering, OS, OOPs, Data Structures & Algorithms. CGPA: 7.91/10 · SGPA: 8.5/10",
         },
     ],
     certifications: [
         {
             name: "Machine Learning Specialization",
             issuer: "DeepLearning.AI \u00B7 Stanford University",
-            period: "Jan 2026 \u2014 Apr 2026",
+            period: "Jan '26 \u2014 May '26",
         },
         {
             name: "OCI Generative AI Professional",

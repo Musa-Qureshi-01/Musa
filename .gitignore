@@ -45,3 +45,24 @@ serviceAccountKey.json
 *.njsproj
 *.sln
 *.sw?
+
+# Firebase
+.firebase/
+
+# Assets (never track)
+public/assets/
+public/projects/
+
+# Binary files
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.svg
+*.mp4
+*.pdf
+
+# Portfolio resume asset
+!public/
+!public/assets/
+!public/assets/Musa_Qureshi_Resume.pdf
