@@ -52,6 +52,21 @@ const DiffBar = ({ label, solved, total, color, beats, loading, delay = 0 }) => 
     );
 };
 
+// ── Codeforces Rank Colors ─────────────────────────────────────────
+const getCfColor = (rating) => {
+    if (rating === 0) return { text: "text-zinc-500", stroke: "stroke-zinc-500", border: "border-zinc-500/20" };
+    if (rating < 1200) return { text: "text-zinc-400", stroke: "stroke-zinc-400/80", border: "border-zinc-500/20" }; // Newbie
+    if (rating < 1400) return { text: "text-emerald-400", stroke: "stroke-emerald-400", border: "border-emerald-500/20" }; // Pupil
+    if (rating < 1600) return { text: "text-cyan-400", stroke: "stroke-cyan-400", border: "border-cyan-500/20" }; // Specialist
+    if (rating < 1900) return { text: "text-blue-400", stroke: "stroke-blue-400", border: "border-blue-500/20" }; // Expert
+    if (rating < 2100) return { text: "text-purple-400", stroke: "stroke-purple-400", border: "border-purple-500/20" }; // Candidate Master
+    if (rating < 2300) return { text: "text-orange-400", stroke: "stroke-orange-400", border: "border-orange-500/20" }; // Master
+    return { text: "text-red-500", stroke: "stroke-red-500", border: "border-red-500/20" }; // Grandmaster
+};
+
+// Helper to capitalize rank name
+const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+
 // ── Main component ────────────────────────────────────────────────
 export const Stats = () => {
     const [githubStats, setGithubStats] = useState({ followers: 0, public_repos: 0 });
@@ -62,19 +77,39 @@ export const Stats = () => {
         hard: 0, totalHard: 909, hardBeats: 0,
         activeDays: 0, submissionCalendar: "{}",
     });
+    const [codeforcesStats, setCodeforcesStats] = useState({
+        rating: 0,
+        maxRating: 0,
+        rank: "Unrated",
+        maxRank: "None",
+    });
     const [loading, setLoading] = useState(true);
+
+    const [isLight, setIsLight] = useState(() => document.documentElement.classList.contains("light"));
+
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setIsLight(document.documentElement.classList.contains("light"));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
 
     const githubUsername = portfolioData.personalInfo.socials.github.split("/").filter(Boolean).pop();
     const leetcodeUsername = portfolioData.personalInfo.socials.leetcode.split("/").filter(Boolean).pop();
+    const codeforcesUsername = portfolioData.personalInfo.socials.codeforces 
+        ? portfolioData.personalInfo.socials.codeforces.split("/").filter(Boolean).pop() 
+        : "Musa06";
 
     useEffect(() => {
         const fetch_ = async () => {
             try {
-                const [ghRes, lcProfileRes, lcSolvedRes, lcCalRes] = await Promise.all([
+                const [ghRes, lcProfileRes, lcSolvedRes, lcCalRes, cfRes] = await Promise.all([
                     fetch(`https://api.github.com/users/${githubUsername}`),
                     fetch(`https://alfa-leetcode-api.onrender.com/${leetcodeUsername}`),
                     fetch(`https://alfa-leetcode-api.onrender.com/${leetcodeUsername}/solved`),
                     fetch(`https://alfa-leetcode-api.onrender.com/${leetcodeUsername}/calendar`),
+                    fetch(`https://codeforces.com/api/user.info?handles=${codeforcesUsername}`),
                 ]);
                 if (ghRes.ok) {
                     const d = await ghRes.json().catch(() => ({}));
@@ -98,11 +133,23 @@ export const Stats = () => {
                     activeDays: lcCal.totalActiveDays || 0,
                     submissionCalendar: lcCal.submissionCalendar || "{}",
                 });
+                if (cfRes.ok) {
+                    const cfData = await cfRes.json().catch(() => ({}));
+                    if (cfData.status === "OK" && cfData.result && cfData.result[0]) {
+                        const user = cfData.result[0];
+                        setCodeforcesStats({
+                            rating: user.rating || 0,
+                            maxRating: user.maxRating || 0,
+                            rank: user.rank || "Unrated",
+                            maxRank: user.maxRank || "None",
+                        });
+                    }
+                }
             } catch (e) { console.error(e); }
             finally { setLoading(false); }
         };
         fetch_();
-    }, [githubUsername, leetcodeUsername]);
+    }, [githubUsername, leetcodeUsername, codeforcesUsername]);
 
 
     const solvedPct = leetcodeStats.totalQuestions > 0
@@ -113,25 +160,25 @@ export const Stats = () => {
     const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
 
     return (
-        <section ref={sectionRef} className="section-padding relative overflow-hidden hidden md:block bg-background">
+        <section ref={sectionRef} className="section-padding relative overflow-hidden hidden md:block bg-background-alt border-t border-border/20">
             <div className="container-responsive relative z-10 mx-auto">
 
                 {/* ── Section heading — same pattern as all sections ── */}
-                <div className="text-center max-w-3xl mx-auto mb-12">
+                <div className="text-center max-w-3xl mx-auto mb-16">
                     <ScrollReveal>
-                        <span className="text-secondary-foreground text-sm font-medium tracking-wider uppercase">
+                        <span className="text-zinc-500 text-sm font-medium tracking-wider uppercase font-mono">
                             Developer Metrics
                         </span>
                     </ScrollReveal>
-                    <div className="mt-4 mb-3">
+                    <div className="mt-3 mb-4">
                         <LetterReveal
                             text="Code & Profile Statistics."
-                            className="text-3xl md:text-4xl font-bold text-foreground font-heading"
+                            className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground font-heading"
                         />
                     </div>
                     <FadeIn delay={0.15}>
-                        <span className="inline-flex items-center gap-1.5 text-xs text-primary font-medium tracking-wider uppercase border border-primary/20 px-3 py-1 rounded-full">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                        <span className="inline-flex items-center gap-1.5 text-[10px] text-foreground font-mono font-bold tracking-wider uppercase border border-border px-3 py-1 rounded-full bg-card">
+                            <span className="w-1.5 h-1.5 rounded-full bg-foreground animate-pulse" />
                             Live Data
                         </span>
                     </FadeIn>
@@ -146,40 +193,40 @@ export const Stats = () => {
                 >
 
                     {/* ═══ GitHub Record ═══════════════════════════════════════ */}
-                    <div className="bg-white/[0.02] rounded-2xl border border-white/[0.07] p-6 flex flex-col gap-5 hover:border-white/[0.12] transition-colors">
+                    <div className="bg-card rounded-2xl border border-border shadow-premium hover:shadow-premium-hover p-6 flex flex-col gap-5 hover:border-border-hover transition-all duration-300">
 
                         {/* Identity row */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                                <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center border border-border/50">
                                     <Github className="w-5 h-5 text-foreground" />
                                 </div>
                                 <div>
                                     <p className="text-sm font-bold text-foreground leading-none">GitHub</p>
                                     <a href={portfolioData.personalInfo.socials.github} target="_blank" rel="noopener noreferrer"
-                                        className="text-[11px] text-zinc-500 hover:text-primary transition-colors">
+                                        className="text-[11px] text-secondary-foreground hover:text-foreground transition-colors">
                                         @{githubUsername}
                                     </a>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-1.5 text-[10px] text-zinc-500">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                            <div className="flex items-center gap-1.5 text-[10px] text-secondary-foreground">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                 Active
                             </div>
                         </div>
 
                         {/* Key numbers */}
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
-                                <div className="flex items-center gap-1.5 text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5">
+                            <div className="bg-secondary/40 rounded-xl p-3 border border-border/40">
+                                <div className="flex items-center gap-1.5 text-secondary-foreground text-[10px] uppercase tracking-wider mb-1.5">
                                     <GitFork className="w-3 h-3" /> Repositories
                                 </div>
                                 <p className="text-2xl font-bold font-mono text-foreground">
                                     <AnimatedNumber value={githubStats.public_repos} loading={loading} />
                                 </p>
                             </div>
-                            <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
-                                <div className="flex items-center gap-1.5 text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5">
+                            <div className="bg-secondary/40 rounded-xl p-3 border border-border/40">
+                                <div className="flex items-center gap-1.5 text-secondary-foreground text-[10px] uppercase tracking-wider mb-1.5">
                                     <Star className="w-3 h-3" /> Followers
                                 </div>
                                 <p className="text-2xl font-bold font-mono text-foreground">
@@ -190,12 +237,15 @@ export const Stats = () => {
 
                         {/* Contribution heatmap — full, readable */}
                         <div>
-                            <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">Contribution Activity</p>
+                            <p className="text-[10px] uppercase tracking-wider text-secondary-foreground mb-3">Contribution Activity</p>
                             <div className="overflow-x-auto pb-1 custom-scrollbar">
                                 <GitHubCalendar
                                     username={githubUsername}
-                                    colorScheme="dark"
-                                    theme={{
+                                    colorScheme={isLight ? "light" : "dark"}
+                                    theme={isLight ? {
+                                        light: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'],
+                                        dark: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'],
+                                    } : {
                                         light: ['#1a2228', '#1c493d', '#1e6c4e', '#20905f', '#22b470'],
                                         dark: ['#1a2228', '#1c493d', '#1e6c4e', '#20905f', '#22b470'],
                                     }}
@@ -210,23 +260,23 @@ export const Stats = () => {
                     </div>
 
                     {/* ═══ LeetCode Record ══════════════════════════════════════ */}
-                    <div className="bg-white/[0.02] rounded-2xl border border-white/[0.07] p-6 flex flex-col gap-5 hover:border-white/[0.12] transition-colors">
+                    <div className="bg-card rounded-2xl border border-border shadow-premium hover:shadow-premium-hover p-6 flex flex-col gap-5 hover:border-border-hover transition-all duration-300">
 
                         {/* Identity row */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-                                    <Code2 className="w-5 h-5 text-amber-400" />
+                                <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center border border-border/50">
+                                    <Code2 className="w-5 h-5 text-amber-500" />
                                 </div>
                                 <div>
                                     <p className="text-sm font-bold text-foreground leading-none">LeetCode</p>
                                     <a href={portfolioData.personalInfo.socials.leetcode} target="_blank" rel="noopener noreferrer"
-                                        className="text-[11px] text-zinc-500 hover:text-amber-400 transition-colors">
+                                        className="text-[11px] text-secondary-foreground hover:text-amber-500 transition-colors">
                                         @{leetcodeUsername}
                                     </a>
                                 </div>
                             </div>
-                            <div className="text-[10px] text-zinc-500 flex items-center gap-1">
+                            <div className="text-[10px] text-secondary-foreground flex items-center gap-1">
                                 <CalendarDays className="w-3 h-3" />
                                 <AnimatedNumber value={leetcodeStats.activeDays} loading={loading} suffix=" days active" />
                             </div>
@@ -237,10 +287,10 @@ export const Stats = () => {
                             {/* Circular SVG */}
                             <div className="relative flex-shrink-0 w-[80px] h-[80px]">
                                 <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
-                                    <circle cx="40" cy="40" r="32" className="stroke-white/5 fill-none" strokeWidth="5" />
+                                    <circle cx="40" cy="40" r="32" className="stroke-muted fill-none" strokeWidth="5" />
                                     <motion.circle
                                         cx="40" cy="40" r="32"
-                                        className="stroke-amber-400 fill-none"
+                                        className="stroke-amber-500 fill-none"
                                         strokeWidth="5"
                                         strokeLinecap="round"
                                         strokeDasharray={circumference}
@@ -255,71 +305,69 @@ export const Stats = () => {
                                     <span className="text-base font-bold font-mono text-foreground leading-none">
                                         <AnimatedNumber value={leetcodeStats.solvedCount} loading={loading} />
                                     </span>
-                                    <span className="text-[9px] text-zinc-500 mt-0.5 uppercase tracking-wider">Solved</span>
+                                    <span className="text-[9px] text-secondary-foreground mt-0.5 uppercase tracking-wider font-semibold">Solved</span>
                                 </div>
                             </div>
 
                             <div className="flex-1">
-                                <p className="text-xs text-zinc-400 mb-1">
+                                <p className="text-xs text-secondary-foreground mb-1">
                                     <span className="text-foreground font-semibold font-mono">
                                         {loading ? "—" : Math.round(solvedPct)}%
                                     </span>{" "}
                                     of {leetcodeStats.totalQuestions.toLocaleString()} problems
                                 </p>
-                                <p className="text-[11px] text-zinc-600">Practice consistency across difficulty tiers</p>
+                                <p className="text-[11px] text-zinc-500 leading-snug">Practice consistency across difficulty tiers</p>
                             </div>
                         </div>
 
                         {/* Difficulty breakdown */}
                         <div className="space-y-3.5">
-                            <DiffBar label="Easy" color="text-emerald-400"
+                            <DiffBar label="Easy" color="text-emerald-500"
                                 solved={leetcodeStats.easy} total={leetcodeStats.totalEasy}
                                 beats={leetcodeStats.easyBeats} loading={loading} delay={0.3} />
-                            <DiffBar label="Medium" color="text-amber-400"
+                            <DiffBar label="Medium" color="text-amber-500"
                                 solved={leetcodeStats.medium} total={leetcodeStats.totalMedium}
                                 beats={leetcodeStats.mediumBeats} loading={loading} delay={0.45} />
-                            <DiffBar label="Hard" color="text-rose-400"
+                            <DiffBar label="Hard" color="text-rose-500"
                                 solved={leetcodeStats.hard} total={leetcodeStats.totalHard}
                                 beats={leetcodeStats.hardBeats} loading={loading} delay={0.6} />
                         </div>
 
-
-
                         {/* Summary footer */}
-                        <div className="pt-3 border-t border-white/5 grid grid-cols-2 gap-3 mt-auto">
-                            <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5 text-center">
+                        <div className="pt-3 border-t border-border/40 grid grid-cols-2 gap-3 mt-auto">
+                            <div className="bg-secondary/40 rounded-xl p-3 border border-border/40 text-center">
                                 <p className="text-xl font-bold font-mono text-foreground">
                                     <AnimatedNumber value={leetcodeStats.solvedCount} loading={loading} />
                                 </p>
-                                <p className="text-[10px] text-zinc-500 mt-0.5 uppercase tracking-wider">Total Solved</p>
+                                <p className="text-[10px] text-secondary-foreground mt-0.5 uppercase tracking-wider">Total Solved</p>
                             </div>
-                            <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5 text-center">
-                                <p className="text-xl font-bold font-mono text-amber-400">
+                            <div className="bg-secondary/40 rounded-xl p-3 border border-border/40 text-center">
+                                <p className="text-xl font-bold font-mono text-amber-500">
                                     {loading ? "—" : `${Math.round(solvedPct)}%`}
                                 </p>
-                                <p className="text-[10px] text-zinc-500 mt-0.5 uppercase tracking-wider">Completion</p>
+                                <p className="text-[10px] text-secondary-foreground mt-0.5 uppercase tracking-wider">Completion</p>
                             </div>
                         </div>
                     </div>
                     {/* ═══ Codeforces Card ═══════════════════════════════════ */}
-                    <div className="bg-white/[0.02] rounded-2xl border border-white/[0.07] p-6 flex flex-col gap-5 hover:border-white/[0.12] transition-colors group/cf">
+                    <div className="bg-card rounded-2xl border border-border shadow-premium hover:shadow-premium-hover p-6 flex flex-col gap-5 hover:border-border-hover transition-all duration-300 group/cf">
 
                         {/* Identity row */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-                                    <Swords className="w-5 h-5 text-purple-400" />
+                                <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center border border-border/50">
+                                    <Swords className={`w-5 h-5 ${getCfColor(codeforcesStats.rating).text}`} />
                                 </div>
                                 <div>
                                     <p className="text-sm font-bold text-foreground leading-none">Codeforces</p>
-                                    <a href="https://codeforces.com/profile/Musa_Qureshi" target="_blank" rel="noopener noreferrer"
-                                        className="text-[11px] text-zinc-500 hover:text-purple-400 transition-colors">
-                                        @Musa_Qureshi
+                                    <a href={portfolioData.personalInfo.socials.codeforces || "https://codeforces.com/profile/Musa06"} target="_blank" rel="noopener noreferrer"
+                                        className="text-[11px] text-secondary-foreground hover:text-foreground transition-colors">
+                                        @{codeforcesUsername}
                                     </a>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-1.5 text-[10px] text-emerald-400">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                            <div className="flex items-center gap-1.5 text-[10px] text-emerald-500">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                 Active
                             </div>
                         </div>
@@ -328,45 +376,55 @@ export const Stats = () => {
                         <div className="flex flex-col items-center justify-center gap-2 py-4">
                             <div className="relative w-[80px] h-[80px] flex items-center justify-center">
                                 <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 80 80">
-                                    <circle cx="40" cy="40" r="32" className="stroke-white/5 fill-none" strokeWidth="5" />
+                                    <circle cx="40" cy="40" r="32" className="stroke-muted fill-none" strokeWidth="5" />
                                     <motion.circle
                                         cx="40" cy="40" r="32"
-                                        className="stroke-purple-500 fill-none"
+                                        className={`fill-none ${getCfColor(codeforcesStats.rating).stroke}`}
                                         strokeWidth="5"
                                         strokeLinecap="round"
                                         strokeDasharray={circumference}
                                         initial={{ strokeDashoffset: circumference }}
-                                        animate={isInView ? { strokeDashoffset: circumference * (1 - 1100 / 3500) } : {}}
+                                        animate={isInView && !loading
+                                            ? { strokeDashoffset: circumference * (1 - Math.min(codeforcesStats.rating / 3000, 1)) }
+                                            : {}}
                                         transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
                                     />
                                 </svg>
                                 <div className="flex flex-col items-center justify-center z-10">
-                                    <span className="text-base font-bold font-mono text-foreground leading-none">1100+</span>
-                                    <span className="text-[9px] text-zinc-500 mt-0.5 uppercase tracking-wider">Rating</span>
+                                    <span className="text-base font-bold font-mono text-foreground leading-none">
+                                        <AnimatedNumber value={codeforcesStats.rating} loading={loading} />
+                                    </span>
+                                    <span className="text-[9px] text-secondary-foreground mt-0.5 uppercase tracking-wider font-semibold">Rating</span>
                                 </div>
                             </div>
-                            <p className="text-[11px] text-zinc-500 text-center">Pupil · Competitive programming</p>
+                            <p className="text-[11px] text-secondary-foreground text-center">
+                                {capitalize(codeforcesStats.rank)} · Competitive programming
+                            </p>
                         </div>
 
                         {/* Stats grid */}
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5 text-center">
-                                <div className="flex items-center justify-center gap-1 text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5">
-                                    <Trophy className="w-3 h-3 text-purple-500/60" /> Rank
+                            <div className="bg-secondary/40 rounded-xl p-3 border border-border/40 text-center">
+                                <div className="flex items-center justify-center gap-1 text-secondary-foreground text-[10px] uppercase tracking-wider mb-1.5">
+                                    <Trophy className="w-3 h-3 text-secondary-foreground/60" /> Rank
                                 </div>
-                                <p className="text-base font-bold font-mono text-purple-400">Pupil</p>
+                                <p className={`text-sm font-bold font-mono ${getCfColor(codeforcesStats.rating).text}`}>
+                                    {capitalize(codeforcesStats.rank)}
+                                </p>
                             </div>
-                            <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5 text-center">
-                                <div className="flex items-center justify-center gap-1 text-zinc-500 text-[10px] uppercase tracking-wider mb-1.5">
-                                    <TrendingUp className="w-3 h-3 text-purple-500/60" /> Max
+                            <div className="bg-secondary/40 rounded-xl p-3 border border-border/40 text-center">
+                                <div className="flex items-center justify-center gap-1 text-secondary-foreground text-[10px] uppercase tracking-wider mb-1.5">
+                                    <TrendingUp className="w-3 h-3 text-secondary-foreground/60" /> Max Rating
                                 </div>
-                                <p className="text-base font-bold font-mono text-foreground">1100+</p>
+                                <p className="text-base font-bold font-mono text-foreground">
+                                    <AnimatedNumber value={codeforcesStats.maxRating} loading={loading} />
+                                </p>
                             </div>
                         </div>
 
                         {/* Divider + note */}
-                        <div className="pt-3 border-t border-white/5">
-                            <p className="text-[11px] text-zinc-600 text-center leading-relaxed">
+                        <div className="pt-3 border-t border-border/40">
+                            <p className="text-[11px] text-zinc-500 text-center leading-relaxed">
                                 Actively solving algorithmic problems to strengthen DSA fundamentals
                             </p>
                         </div>

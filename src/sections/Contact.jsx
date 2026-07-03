@@ -1,256 +1,305 @@
 import {
-  Mail,
-  Phone,
-  MapPin,
-  Send,
-  CheckCircle,
-  AlertCircle,
+  Mail, Phone, MapPin, Send, CheckCircle, AlertCircle,
+  ArrowRight, Calendar, Zap, BookOpen, Code2, Mic2, GitBranch
 } from "lucide-react";
-import { Button } from "@/components/Button";
-import { useState } from "react";
-
+import { useState, useRef, useEffect } from "react";
 import { portfolioData } from "@/data/portfolio";
-import { Reveal, FadeIn } from "@/components/Reveal";
-import { ScrollReveal, LetterReveal } from "@/components/TextAnimations";
 
-const contactInfo = [
-  {
-    icon: Mail,
-    label: "Email",
-    value: portfolioData.personalInfo.email,
-    href: `mailto:${portfolioData.personalInfo.email}`,
-  },
-  {
-    icon: Phone,
-    label: "Phone",
-    value: portfolioData.personalInfo.phone,
-    href: `tel:${portfolioData.personalInfo.phone.replace(/\s+/g, "")}`,
-  },
-  {
-    icon: MapPin,
-    label: "Location",
-    value: portfolioData.personalInfo.location,
-    href: "#",
-  },
+/* ─── Scroll reveal ──────────────────────────────────────────────────────── */
+function useScrollReveal(delay = 0) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.opacity = "0";
+    el.style.transform = "translateY(24px)";
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        el.style.transition = `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`;
+        el.style.opacity = "1";
+        el.style.transform = "translateY(0)";
+        obs.disconnect();
+      }
+    }, { threshold: 0.08 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [delay]);
+  return ref;
+}
+
+/* ─── Glass input (dual-mode) ────────────────────────────────────────────── */
+function GlassInput({ label, id, type = "text", required, placeholder, value, onChange }) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <div>
+      <label
+        htmlFor={id}
+        className={`block text-[10px] font-semibold uppercase tracking-[0.12em] mb-1.5 transition-colors duration-200 ${focused ? "text-foreground" : "text-muted-foreground"}`}
+      >
+        {label}{required && <span className="text-violet-500 ml-0.5">*</span>}
+      </label>
+      <input
+        id={id} type={type} required={required}
+        placeholder={placeholder} value={value} onChange={onChange}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        className={`w-full px-3.5 py-3 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all duration-200
+          bg-card border border-border
+          focus:border-foreground/40 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.06)]
+          .light &:focus:shadow-[0_0_0_3px_rgba(0,0,0,0.08)]`}
+      />
+    </div>
+  );
+}
+
+function GlassTextarea({ label, id, required, placeholder, value, onChange, rows = 4 }) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <div>
+      <label
+        htmlFor={id}
+        className={`block text-[10px] font-semibold uppercase tracking-[0.12em] mb-1.5 transition-colors duration-200 ${focused ? "text-foreground" : "text-muted-foreground"}`}
+      >
+        {label}{required && <span className="text-violet-500 ml-0.5">*</span>}
+      </label>
+      <textarea
+        id={id} required={required} placeholder={placeholder}
+        value={value} onChange={onChange} rows={rows}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        className="w-full px-3.5 py-3 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all duration-200 resize-none
+          bg-card border border-border
+          focus:border-foreground/40 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.06)]"
+      />
+    </div>
+  );
+}
+
+/* ─── Submit button ──────────────────────────────────────────────────────── */
+function SubmitButton({ loading }) {
+  const [pressed, setPressed] = useState(false);
+  return (
+    <button
+      type="submit" disabled={loading}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
+      onMouseLeave={() => setPressed(false)}
+      className={`relative w-full h-11 rounded-full overflow-hidden font-semibold text-sm tracking-wide transition-all duration-150 group/btn
+        bg-foreground text-background border border-foreground disabled:opacity-50
+        hover:shadow-[0_6px_24px_rgba(0,0,0,0.25)]
+        ${pressed ? "scale-[0.98]" : "hover:scale-[1.01]"}`}
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-500 ease-out" />
+      <span className="relative flex items-center justify-center gap-2">
+        {loading
+          ? <span className="w-4 h-4 border-2 border-background/40 border-t-background rounded-full animate-spin" />
+          : <><Send className="w-3.5 h-3.5" /> Send message <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" /></>
+        }
+      </span>
+    </button>
+  );
+}
+
+/* ─── Success state ──────────────────────────────────────────────────────── */
+function SuccessState({ onReset }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="w-12 h-12 rounded-full border border-foreground/20 bg-foreground/5 flex items-center justify-center mb-4">
+        <CheckCircle className="w-6 h-6 text-foreground" />
+      </div>
+      <h3 className="text-base font-bold font-heading text-foreground mb-1.5">Message sent.</h3>
+      <p className="text-xs text-muted-foreground max-w-[220px] leading-relaxed mb-4">
+        I'll get back to you within 24–48 hours.
+      </p>
+      <button onClick={onReset} className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4">
+        Send another
+      </button>
+    </div>
+  );
+}
+
+/* ─── Availability roles ─────────────────────────────────────────────────── */
+const AVAILABILITY = [
+  { icon: Code2,     label: "AI & Software Engineering",    desc: "Production AI & scalable software" },
+  { icon: Zap,       label: "Forward Deployed Engineering", desc: "Enterprise AI deployment & integration" },
+  { icon: GitBranch, label: "Research & Collaboration",     desc: "AI Security & Agentic AI research" },
+  { icon: BookOpen,  label: "AI Consulting",                desc: "LLMs, automation & AI strategy" },
 ];
 
+function RolePill({ item }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`group/role relative overflow-hidden flex items-center gap-2 px-3 py-2 rounded-xl border cursor-default select-none
+        transition-all duration-300 ease-out
+        border-border bg-secondary
+        hover:border-foreground/30 hover:bg-foreground hover:text-background hover:shadow-[0_4px_20px_rgba(0,0,0,0.15)]
+        ${hovered ? "scale-[1.04]" : "scale-100"}`}
+    >
+      {/* Shine sweep on hover */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/role:translate-x-full transition-transform duration-500 ease-out pointer-events-none" />
+
+      <item.icon className={`w-3.5 h-3.5 shrink-0 transition-colors duration-200 ${hovered ? "text-background" : "text-muted-foreground"}`} />
+      <div>
+        <p className={`text-xs font-semibold leading-tight transition-colors duration-200 ${hovered ? "text-background" : "text-foreground"}`}>
+          {item.label}
+        </p>
+        <p className={`text-[10px] leading-tight transition-colors duration-200 ${hovered ? "text-background/70" : "text-muted-foreground"}`}>
+          {item.desc}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Data ───────────────────────────────────────────────────────────────── */
+const contactInfo = [
+  { icon: Mail,   label: "Personal",  value: portfolioData.personalInfo.email,               href: `mailto:${portfolioData.personalInfo.email}` },
+  { icon: Mail,   label: "Institute", value: "musa.qureshi@bansalinstitutes.ac.in",          href: "mailto:musa.qureshi@bansalinstitutes.ac.in" },
+  { icon: Phone,  label: "Phone",     value: portfolioData.personalInfo.phone,               href: `tel:${portfolioData.personalInfo.phone.replace(/\s+/g, "")}` },
+  { icon: MapPin, label: "Location",  value: portfolioData.personalInfo.location,            href: "#" },
+];
+
+/* ─── Main ───────────────────────────────────────────────────────────────── */
 export const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState({
-    type: null, // 'success' or 'error'
-    message: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [loading,  setLoading]  = useState(false);
+  const [status,   setStatus]   = useState(null);
+
+  const headerRef = useScrollReveal(0);
+  const bodyRef   = useScrollReveal(100);
+
+  const set = (k) => (e) => setFormData((f) => ({ ...f, [k]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    setIsLoading(true);
-    setSubmitStatus({ type: null, message: "" });
+    setLoading(true);
+    setStatus(null);
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          access_key: "7d89d23d-355c-4fa3-8383-515c4344c2b2",
-          name: formData.name,
-          email: formData.email,
-          message: formData.message,
-        }),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ access_key: "7d89d23d-355c-4fa3-8383-515c4344c2b2", ...formData }),
       });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setSubmitStatus({
-          type: "success",
-          message: "Message sent successfully! I'll get back to you soon.",
-        });
-        setFormData({ name: "", email: "", message: "" });
-      } else {
-        throw new Error(result.message || "Failed to send message. Please try again later.");
-      }
-    } catch (err) {
-      console.error("Web3Forms error:", err);
-      setSubmitStatus({
-        type: "error",
-        message:
-          err.message || "Failed to send message. Please try again later.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+      const data = await res.json();
+      if (data.success) { setStatus("success"); setFormData({ name: "", email: "", message: "" }); }
+      else throw new Error();
+    } catch { setStatus("error"); }
+    finally { setLoading(false); }
   };
+
   return (
-    <section id="contact" className="section-padding relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-full">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-highlight/5 rounded-full blur-3xl" />
+    <section id="contact" className="relative overflow-hidden bg-background border-t border-border">
+      {/* Subtle ambient glow */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-foreground/[0.025] rounded-full blur-[100px]" />
       </div>
 
-      <div className="container-responsive relative z-10">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <ScrollReveal>
-            <span className="text-secondary-foreground text-sm font-medium tracking-wider uppercase">
-              Get In Touch
-            </span>
-          </ScrollReveal>
+      <div className="container-responsive relative z-10 py-16 md:py-20">
 
-          <div className="mt-4 mb-6">
-            <LetterReveal text="Let's build something great." className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground font-heading" />
-          </div>
-
-          <ScrollReveal delay={0.2}>
-            <p className="text-zinc-400">
-              Have a project in mind? I'd love to hear about it. Send me a message
-              and let's discuss how we can work together.
-            </p>
-          </ScrollReveal>
+        {/* ── Header ── */}
+        <div ref={headerRef} className="mb-10 md:mb-12">
+          <span className="inline-block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground mb-3">
+            Get in touch
+          </span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-heading tracking-tight text-foreground leading-tight mb-3">
+            Let's build something&nbsp;great.
+          </h2>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
+            Have a project, idea, or question? I'd love to hear from you.
+          </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 max-w-6xl mx-auto">
-          <FadeIn delay={0.3} className="h-full">
-            <div className="bg-white/[0.02] p-6 md:p-8 rounded-3xl border border-white/10 shadow-lg h-full flex flex-col relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-              <form className="space-y-6 relative z-10" onSubmit={handleSubmit}>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium mb-2 text-muted-foreground">
-                      Name
-                    </label>
-                    <input
-                      id="name"
-                      type="text"
-                      required
-                      placeholder={portfolioData.personalInfo.name}
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 rounded-xl border border-white/10 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all placeholder:text-muted-foreground/30"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium mb-2 text-muted-foreground">
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      required
-                      placeholder={portfolioData.personalInfo.email}
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 rounded-xl border border-white/10 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all placeholder:text-muted-foreground/30"
-                    />
-                  </div>
+        {/* ── Content grid ── */}
+        <div ref={bodyRef} className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-5 items-start">
+
+          {/* Form card */}
+          <div className="rounded-2xl border border-border bg-card shadow-premium p-5 sm:p-6">
+            {status === "success" ? (
+              <SuccessState onReset={() => setStatus(null)} />
+            ) : (
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <GlassInput label="Name"  id="cn-name"  required placeholder="Your name"       value={formData.name}    onChange={set("name")} />
+                  <GlassInput label="Email" id="cn-email" type="email" required placeholder="you@example.com" value={formData.email}   onChange={set("email")} />
                 </div>
+                <GlassTextarea
+                  label="Message" id="cn-msg" required
+                  placeholder="Tell me about your project, idea, or question…"
+                  value={formData.message} onChange={set("message")} rows={5}
+                />
 
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium mb-2 text-muted-foreground">
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
-                    rows={6}
-                    required
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Tell me about your project..."
-                    className="w-full px-4 py-3 bg-white/5 rounded-xl border border-white/10 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all resize-none placeholder:text-muted-foreground/30"
-                  />
-                </div>
-
-                <Button className="w-full h-12 text-base" type="submit" disabled={isLoading}>
-                  {isLoading ? (
-                    <>Sending...</>
-                  ) : (
-                    <>
-                      Send Message
-                      <Send className="w-5 h-5 ml-2" />
-                    </>
-                  )}
-                </Button>
-
-                {submitStatus.type && (
-                  <div
-                    className={`flex items-center gap-3 p-4 rounded-xl ${submitStatus.type === "success"
-                      ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
-                      : "bg-rose-500/10 border border-rose-500/20 text-rose-400"
-                      }`}
-                  >
-                    {submitStatus.type === "success" ? (
-                      <CheckCircle className="w-5 h-5 flex-shrink-0" />
-                    ) : (
-                      <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    )}
-                    <p className="text-sm font-medium">{submitStatus.message}</p>
+                {status === "error" && (
+                  <div className="flex items-center gap-2.5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <p className="text-xs">Something went wrong. Please try again or email me directly.</p>
                   </div>
                 )}
-              </form>
 
-              <div className="mt-8 pt-8 border-t border-white/10 text-center relative z-20">
-                <p className="text-sm text-muted-foreground mb-4">Prefer a direct conversation?</p>
+                <SubmitButton loading={loading} />
+
+                <div className="flex items-center gap-3">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">or</span>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+
                 <a
                   href="https://cal.com/musa-qureshi-01/15min"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex w-full sm:w-auto items-center justify-center h-12 px-8 rounded-full bg-white/5 border border-white/10 hover:border-primary/50 hover:bg-white/10 text-foreground font-medium transition-all group"
+                  target="_blank" rel="noopener noreferrer"
+                  className="group/cal flex items-center justify-center gap-2 h-10 rounded-full border border-border bg-secondary hover:border-foreground/40 hover:bg-foreground hover:text-background text-sm font-medium text-muted-foreground transition-all duration-200"
                 >
-                  Book a 15-min Meeting
-                  <Phone className="w-4 h-4 ml-2 opacity-50 group-hover:opacity-100 transition-opacity" />
+                  <Calendar className="w-3.5 h-3.5" />
+                  Book a 15-min call
+                  <ArrowRight className="w-3.5 h-3.5 group-hover/cal:translate-x-0.5 transition-transform" />
                 </a>
+              </form>
+            )}
+          </div>
+
+          {/* ── Info sidebar — sticky, max-height capped ── */}
+          <div className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
+            <div className="relative rounded-2xl border border-border bg-card shadow-premium p-5">
+
+              {/* Contact rows */}
+              <p className="text-[9px] font-mono tracking-[0.18em] uppercase text-muted-foreground mb-3">Contact</p>
+              <div className="space-y-2.5 mb-4">
+                {contactInfo.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="flex items-start gap-2.5 hover:opacity-70 transition-opacity"
+                  >
+                    <item.icon className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="text-[8px] font-mono tracking-wider uppercase text-muted-foreground/60 leading-none mb-0.5">{item.label}</p>
+                      <p className="text-xs text-foreground break-all leading-tight">{item.value}</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+
+              {/* Divider */}
+              <div className="h-px bg-border mb-4" />
+
+              {/* Available For — compact pill badges (no description) */}
+              <div className="flex items-center gap-1.5 mb-3">
+                <span className="relative flex h-1.5 w-1.5 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-60" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                </span>
+                <p className="text-[9px] font-mono tracking-[0.18em] uppercase text-muted-foreground">Available For</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {AVAILABILITY.map((item) => (
+                  <RolePill key={item.label} item={item} />
+                ))}
               </div>
             </div>
-          </FadeIn>
+          </div>
 
-          {/* Contact Info */}
-          <FadeIn delay={0.4} className="space-y-6 h-full">
-            <div className="bg-white/[0.02] p-6 md:p-8 rounded-3xl border border-white/10 shadow-lg h-full flex flex-col justify-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10">
-                <h3 className="text-xl md:text-2xl font-bold mb-6 font-heading">Contact Information</h3>
-                <div className="space-y-6">
-                  {contactInfo.map((item, i) => (
-                    <a
-                      key={i}
-                      href={item.href}
-                      className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/5 transition-all group border border-transparent hover:border-white/5"
-                    >
-                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                        <item.icon className="w-6 h-6 text-primary" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground font-medium mb-1">
-                          {item.label}
-                        </div>
-                        <div className="font-semibold text-sm sm:text-base break-all">{item.value}</div>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-
-                <div className="mt-12 p-6 rounded-2xl bg-primary/5 border border-primary/10">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="relative flex h-3 w-3">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                    </span>
-                    <span className="font-semibold text-emerald-500">Currently Available</span>
-                  </div>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    I'm currently open to new opportunities. Whether you need a full-time engineer or a consultant for your next big AI project, let's talk!
-                  </p>
-                </div>
-              </div>
-            </div>
-          </FadeIn>
         </div>
       </div>
     </section>

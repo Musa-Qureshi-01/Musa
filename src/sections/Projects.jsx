@@ -1,450 +1,494 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { ArrowUpRight, Github, ExternalLink, ChevronLeft, ChevronRight, X, Maximize2, FileText, Play } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { 
+  ArrowRight, 
+  ArrowUpRight, 
+  Github, 
+  ExternalLink, 
+  ShieldCheck, 
+  FileText,
+  BookOpen,
+  Play,
+  X 
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { portfolioData } from "@/data/portfolio";
 import { Reveal, FadeIn } from "@/components/Reveal";
 import { Button } from "@/components/Button";
 import { LetterReveal, ScrollReveal } from "@/components/TextAnimations";
-import { motion, AnimatePresence, useAnimation, useInView } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
-// --- Custom Trace Button Component ---
-const TraceButton = ({ children, href, onClick, className = "", primary = false }) => {
-  const Component = href ? motion.a : motion.button;
+const LaunchCountdown = ({ isLight, isMini = false }) => {
+  const [timeLeft, setTimeLeft] = useState({ days: 12, hours: 8, minutes: 45, seconds: 12 });
 
-  return (
-    <Component
-      href={href}
-      onClick={onClick}
-      target={href ? "_blank" : undefined}
-      rel={href ? "noopener noreferrer" : undefined}
-      whileTap={{ scale: 0.95 }}
-      className={`relative inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-full overflow-hidden group transition-all duration-300 z-10
-        ${primary
-          ? "bg-primary/10 text-primary hover:text-primary-foreground border border-primary/30 hover:border-primary hover:shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.4)]"
-          : "bg-white/5 text-zinc-300 border border-white/10 hover:border-white/30 hover:bg-white/10 hover:text-white"
-        } ${className}`}
-    >
-      {/* Animated Glow Backdrop on hover for primary */}
-      {primary && (
-        <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out z-[-1]" />
-      )}
-
-      {/* Subtle Trace border overlay */}
-      <div className="absolute inset-0 rounded-full border border-transparent group-hover:border-primary/50 transition-colors duration-500 z-[-1]" />
-
-      <span className="relative z-10 flex items-center gap-1.5">{children}</span>
-    </Component>
-  );
-};
-
-// --- Project Card Component ---
-const ProjectCard = ({ project, onLearnMore, index, isActive }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{
-        duration: 0.7,
-        delay: (index % 4) * 0.1,
-        ease: [0.21, 0.47, 0.32, 0.98]
-      }}
-      className={`group relative flex-shrink-0 w-[85vw] sm:w-[280px] md:w-[320px] lg:w-[350px] backdrop-blur-md rounded-2xl overflow-hidden border transition-all duration-700 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex flex-col snap-center hover:-translate-y-1 ${isActive ? "border-primary/50 shadow-[0_0_30px_rgba(var(--color-primary-rgb),0.2)] bg-zinc-900/80" : "border-white/10 bg-zinc-900/40"}`}
-      style={{
-        WebkitBackfaceVisibility: 'hidden',
-        WebkitTransform: 'translate3d(0, 0, 0)'
-      }}
-    >
-      {/* Hot-Mask Reveal overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 ease-out pointer-events-none z-0 mix-blend-screen" />
-
-      {/* Soft Glow Radial on hover */}
-      <div className="absolute -inset-24 bg-primary/20 rounded-full blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none z-[-1]" />
-
-      {/* Banner */}
-      <div className="w-full h-40 sm:h-44 md:h-48 overflow-hidden relative border-b border-white/10 shrink-0 bg-zinc-950">
-        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-700 z-10 pointer-events-none" />
-
-        {project.image ? (
-          <motion.img
-            src={project.image}
-            alt={project.title}
-            className={`w-full h-full object-cover transform origin-center ${project.image.includes('coming-soon') ? '' : 'scale-105 group-hover:scale-110'} transition-transform duration-1000 ease-[0.21,0.47,0.32,0.98]`}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-950 to-black">
-            <span className="text-zinc-600 text-sm tracking-widest uppercase">No Preview</span>
-          </div>
-        )}
-
-        {/* bottom gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 group-hover:translate-y-4 transition-all duration-700 z-10 pointer-events-none" />
-      </div>
-
-      {/* Content */}
-      <div className="p-5 md:p-6 flex flex-col flex-grow z-10 relative">
-        <h3 className="text-xl font-bold font-heading mb-2 text-zinc-100 group-hover:text-primary transition-colors duration-500 ease-out">
-          {project.title}
-        </h3>
-
-        {/* Compact Tech Stack */}
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {project.tech.slice(0, 4).map((tech, idx) => (
-            <span key={idx} className="text-[10px] sm:text-xs px-2 py-0.5 rounded-md bg-white/5 border border-white/5 text-zinc-400 font-medium group-hover:bg-white/10 group-hover:text-zinc-300 transition-colors duration-500">
-              {tech}
-            </span>
-          ))}
-          {project.tech.length > 4 && (
-            <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-md bg-white/5 border border-white/5 text-zinc-400 font-medium group-hover:bg-white/10 group-hover:text-zinc-300 transition-colors duration-500">
-              +{project.tech.length - 4}
-            </span>
-          )}
-        </div>
-
-        {/* 1-Line Description */}
-        <p className="text-sm text-zinc-400 line-clamp-2 mb-6 font-body flex-grow group-hover:text-zinc-300 transition-colors duration-500">
-          {project.description || (project.highlights && project.highlights[0])}
-        </p>
-
-        {/* Actions */}
-        <div className="mt-auto flex flex-col gap-2 pt-4">
-          <div className="flex gap-3 w-full">
-            {project.link && project.link !== "#" && (
-              <TraceButton href={project.link} primary className="flex-1 justify-center py-2.5 bg-primary/10 hover:bg-primary/20 hover:text-white border-primary/50 text-[11px] sm:text-xs font-medium tracking-wide">
-                Preview <ExternalLink className="w-3.5 h-3.5" />
-              </TraceButton>
-            )}
-            <TraceButton onClick={() => onLearnMore(project)} className="flex-1 justify-center py-2.5 bg-zinc-900 border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white text-[11px] sm:text-xs font-medium tracking-wide">
-              Learn More
-            </TraceButton>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// --- Project Modal (Expanded View) ---
-const ProjectModal = ({ project, onClose }) => {
-  // Lock body scroll when modal is open
   useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = "unset"; };
+    // Target date: 12 days from now
+    const targetDate = new Date("2026-07-15T00:00:00").getTime();
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference <= 0) {
+        clearInterval(interval);
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      } else {
+        const d = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((difference % (1000 * 60)) / 1000);
+        setTimeLeft({ days: d, hours: h, minutes: m, seconds: s });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  if (!project) return null;
+  const formatNumber = (num) => String(num).padStart(2, "0");
+
+  if (isMini) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center p-2 font-mono relative overflow-hidden bg-[#0c0d0e]/95 text-white select-none">
+        <div className="mb-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[7px] font-bold tracking-widest uppercase border bg-white/5 border-white/10 text-zinc-400 relative z-10">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Launching Soon
+        </div>
+        <div className="flex gap-1 text-[10px] sm:text-xs font-extrabold relative z-10 text-white">
+          <span>{formatNumber(timeLeft.days)}d</span>
+          <span className="text-zinc-500">:</span>
+          <span>{formatNumber(timeLeft.hours)}h</span>
+          <span className="text-zinc-500">:</span>
+          <span>{formatNumber(timeLeft.minutes)}m</span>
+          <span className="text-zinc-500">:</span>
+          <span>{formatNumber(timeLeft.seconds)}s</span>
+        </div>
+        <div className="text-[6px] tracking-[0.12em] mt-1 text-zinc-500 relative z-10 uppercase">
+          T-Minus Deployment
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 mb:p-12 pointer-events-none">
-        {/* Dimmer Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto"
-          onClick={onClose}
-        />
+    <div className="w-full h-full flex flex-col items-center justify-center p-6 md:p-8 font-mono relative overflow-hidden bg-black text-white">
+      {/* Background Image with Low Opacity */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center opacity-25 pointer-events-none mix-blend-screen"
+        style={{ backgroundImage: "url('/assets/launch-soon-bg.png')" }}
+      />
+      {/* Subtle overlay to ensure contrast */}
+      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
 
-        {/* Modal Panel */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="relative w-full max-w-4xl bg-zinc-950 border border-white/10 shadow-2xl rounded-2xl md:rounded-3xl overflow-hidden pointer-events-auto max-h-[90vh] flex flex-col"
-        >
-          {/* Close Header */}
-          <div className="absolute top-4 right-4 z-20">
-            <button
-              onClick={onClose}
-              className="p-2 bg-black/50 hover:bg-black/80 backdrop-blur-md rounded-full text-zinc-400 hover:text-white transition-colors border border-white/10 hover:border-white/30"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+      <div className="mb-4 md:mb-5.5 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] md:text-[12px] font-bold tracking-widest uppercase border bg-white/5 border-white/10 text-zinc-300 relative z-10">
+        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        Launching Soon
+      </div>
 
-          <div className="overflow-y-auto custom-scrollbar flex-grow">
-            {/* Expanded Banner */}
-            {project.image && (
-              <div className="w-full h-48 sm:h-64 lg:h-80 relative bg-zinc-900 border-b border-white/10">
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent z-10" />
-                <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
-              </div>
-            )}
+      <h4 className="text-[11px] md:text-[14px] font-bold tracking-[0.25em] uppercase mb-4 md:mb-6 text-center text-zinc-400 relative z-10">
+        EDITORIAL.IO DEPLOYMENT TIMER
+      </h4>
 
-            {/* Modal Content */}
-            <div className={"p-6 sm:p-8 lg:p-10 " + (!project.image ? "pt-12" : "")}>
-              <h2 className="text-2xl sm:text-4xl font-bold font-heading text-white mb-2">{project.title}</h2>
-              <p className="text-primary text-sm font-medium mb-6 uppercase tracking-wider">{project.category}</p>
-
-              <p className="text-zinc-300 leading-relaxed mb-8 text-base sm:text-lg">
-                {project.description}
-              </p>
-
-              {/* Highlights */}
-              {project.highlights && project.highlights.length > 0 && (
-                <div className="mb-8 pl-4 border-l-2 border-primary/50">
-                  <h4 className="text-white font-medium mb-3">Key Highlights</h4>
-                  <ul className="space-y-2">
-                    {project.highlights.map((highlight, idx) => (
-                      <li key={idx} className="text-sm sm:text-base text-zinc-400 leading-relaxed list-disc ml-4">
-                        {highlight}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Full Tech Stack */}
-              <div className="mb-10">
-                <h4 className="text-white font-medium mb-3">Technologies & Architecture</h4>
-                <div className="flex flex-wrap gap-2">
-                  {project.tech.map((tech, idx) => (
-                    <span key={idx} className="text-sm px-3 py-1.5 rounded-md bg-white/5 border border-white/10 text-zinc-300 font-medium">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Expanded Actions - Grid layout for Modal */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6 border-t border-white/10 mt-auto">
-                {project.link && project.link !== "#" && (
-                  <TraceButton href={project.link} primary className="w-full justify-center py-3 border-primary bg-primary/10 hover:bg-primary/20 hover:text-white">
-                    Live Demo <ExternalLink className="w-4 h-4" />
-                  </TraceButton>
-                )}
-
-                {project.github && project.github !== "#" && (
-                  <TraceButton href={project.github} className="w-full justify-center py-3 bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white hover:border-white">
-                    GitHub <Github className="w-4 h-4" />
-                  </TraceButton>
-                )}
-
-                {project.video && (
-                  <TraceButton href={project.video} className="w-full justify-center py-3 border-blue-900/50 bg-blue-950/30 text-blue-400 hover:border-blue-500 hover:text-blue-300 hover:bg-blue-900/50">
-                    Play Video <Play className="w-4 h-4" />
-                  </TraceButton>
-                )}
-
-                {project.article && (
-                  <TraceButton href={project.article} className="w-full justify-center py-3 border-emerald-900/50 bg-emerald-950/30 text-emerald-400 hover:border-emerald-500 hover:text-emerald-300 hover:bg-emerald-900/50">
-                    Read Article <FileText className="w-4 h-4" />
-                  </TraceButton>
-                )}
-              </div>
+      <div className="grid grid-cols-4 gap-4.5 md:gap-7 max-w-sm md:max-w-md lg:max-w-lg relative z-10">
+        {[
+          { label: "DAYS", value: timeLeft.days },
+          { label: "HOURS", value: timeLeft.hours },
+          { label: "MINS", value: timeLeft.minutes },
+          { label: "SECS", value: timeLeft.seconds },
+        ].map((unit, idx) => (
+          <div key={idx} className="flex flex-col items-center">
+            <div className="w-15 h-20 md:w-22 md:h-26 rounded-lg md:rounded-2xl border flex items-center justify-center text-2xl md:text-4xl font-extrabold shadow-lg bg-black/60 border-white/15 text-white backdrop-blur-sm">
+              {formatNumber(unit.value)}
             </div>
+            <span className="text-[9px] md:text-[11px] font-bold tracking-wider mt-2.5 text-zinc-400">
+              {unit.label}
+            </span>
           </div>
-        </motion.div>
+        ))}
       </div>
-    </AnimatePresence>
+
+      <div className="w-full max-w-[260px] md:max-w-[340px] mt-7 md:mt-10 font-sans relative z-10">
+        <div className="flex justify-between items-center text-[9px] md:text-[11px] font-bold text-zinc-400 tracking-wider mb-2">
+          <span>PIPELINE BUILD</span>
+          <span>92%</span>
+        </div>
+        <div className="w-full h-1.5 md:h-2 rounded-full overflow-hidden bg-white/10">
+          <div 
+            className="h-full rounded-full bg-white transition-all duration-500" 
+            style={{ width: "92%" }} 
+          />
+        </div>
+      </div>
+    </div>
   );
 };
 
-// --- Gallery Layout ---
 export const Projects = () => {
-  const { projects } = portfolioData;
-  const baseProjects = projects.slice(0, 4);
-  // Duplicate array multiple times to create a robust pseudo-infinite loop
-  const displayedProjects = [...baseProjects, ...baseProjects, ...baseProjects, ...baseProjects];
+  const [activeModalProject, setActiveModalProject] = useState(null);
+  const [isLight, setIsLight] = useState(false);
 
-  const [selectedProject, setSelectedProject] = useState(null);
-  const sliderRef = useRef(null);
-
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeftState, setScrollLeftState] = useState(0);
-
-  const slide = useCallback((direction) => {
-    if (sliderRef.current) {
-      // 350px max-width + updated larger gap (64px / 48px / 32px)
-      const gapWidth = window.innerWidth >= 1024 ? 64 : window.innerWidth >= 768 ? 48 : 32;
-      const cardWidth = Math.min(window.innerWidth * 0.85, 350) + gapWidth;
-      const scrollAmount = direction === 'left' ? -cardWidth : cardWidth;
-      sliderRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
+  useEffect(() => {
+    setIsLight(document.documentElement.classList.contains("light"));
+    const observer = new MutationObserver(() => {
+      setIsLight(document.documentElement.classList.contains("light"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
   }, []);
 
-  const getBaseWidth = () => {
-    const gapWidth = window.innerWidth >= 1024 ? 64 : window.innerWidth >= 768 ? 48 : 32;
-    return Math.min(window.innerWidth * 0.85, 350) + gapWidth;
-  };
-
-  // Seamless scroll reset logic
-  const handleScroll = useCallback(() => {
-    if (!sliderRef.current) return;
-
-    const slider = sliderRef.current;
-    if (slider.scrollWidth === 0) return; // Not fully rendered yet
-
-    const baseWidth = getBaseWidth();
-    const setWidth = baseWidth * baseProjects.length;
-
-    // When we scroll past the first set (left bounce) or past the third set (right bounce)
-    // we instantly silently snap back to the middle (second) set.
-    if (slider.scrollLeft <= baseWidth) {
-      // Snapping from far left back to middle clone
-      slider.style.scrollBehavior = 'auto'; // Disable smooth scroll temporarily
-      slider.scrollLeft += setWidth;
-      slider.style.scrollBehavior = 'smooth';
-    } else if (slider.scrollLeft >= setWidth * 2.5) {
-      // Snapping from far right back to middle clone
-      slider.style.scrollBehavior = 'auto';
-      slider.scrollLeft -= setWidth;
-      slider.style.scrollBehavior = 'smooth';
-    }
-
-    const index = Math.round(slider.scrollLeft / baseWidth);
-    setActiveIndex(index % baseProjects.length);
-  }, [baseProjects.length]);
-
-  // Initial center position setup
-  useEffect(() => {
-    if (sliderRef.current) {
-      const setWidth = getBaseWidth() * baseProjects.length;
-      // Start perfectly at the beginning of the second set of clones
-      sliderRef.current.scrollLeft = setWidth;
-    }
-  }, []);
-
-  // Auto Slider Logic & Active Tracking
-  useEffect(() => {
-    if (isHovered || isDragging) return; // Pause on hover/drag
-
-    const slideInterval = setInterval(() => {
-      slide('right');
-    }, 4000); // 4 seconds auto-play
-
-    return () => clearInterval(slideInterval);
-  }, [isHovered, isDragging, slide]);
-
-  // Desktop Drag to scroll
-  const handleMouseDown = (e) => {
-    if (!sliderRef.current || window.innerWidth < 1024) return;
-    setIsDragging(true);
-    setStartX(e.pageX - sliderRef.current.offsetLeft);
-    setScrollLeftState(sliderRef.current.scrollLeft);
-  };
-  const handleMouseLeave = () => { setIsDragging(false); setIsHovered(false); };
-  const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseUp = () => setIsDragging(false);
-  const handleMouseMove = (e) => {
-    if (!isDragging || !sliderRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    sliderRef.current.scrollLeft = scrollLeftState - walk;
-  };
+  // Extract GovernanceAI (ID 3) and EDITORIAL.IO (ID 4) as featured projects
+  const featuredProjects = portfolioData.projects.filter(
+    (p) => p.title === "GovernanceAI" || p.title === "EDITORIAL.IO"
+  );
 
   return (
-    <section id="projects" className="relative overflow-hidden min-h-screen flex flex-col justify-center py-20 pb-24">
-      {/* Background glow effects */}
-      <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 left-0 w-[400px] h-[400px] bg-highlight/5 rounded-full blur-[100px] pointer-events-none" />
-
-      <div className="container-responsive relative z-10">
-        {/* Header */}
-        <div className="text-center mx-auto max-w-3xl mb-12">
+    <section id="projects" className="section-padding relative overflow-hidden bg-background-alt border-t border-border/20">
+      <div className="container-responsive relative z-10 mx-auto">
+        
+        {/* Section Header */}
+        <div className="text-center mx-auto max-w-3xl mb-10 md:mb-12">
           <ScrollReveal>
-            <span className="text-secondary-foreground text-sm font-medium tracking-wider uppercase">
-              Engineering Showcase
+            <span className="text-secondary-foreground text-sm font-medium tracking-wider uppercase font-mono">
+              Selected Work
             </span>
           </ScrollReveal>
-
-          <div className="mt-4 mb-4">
-            <LetterReveal text="Systems that demonstrate depth." className="text-2xl sm:text-4xl md:text-5xl font-bold text-white font-heading" />
+          <div className="mt-3 mb-4">
+            <LetterReveal 
+              text="Featured Products." 
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground font-heading" 
+            />
           </div>
-
           <ScrollReveal delay={0.2}>
-            <p className="text-zinc-400 text-base md:text-lg">
-              Selected real-world applications highlighting agentic workflows, production ML pipelines, and full-stack engineering.
+            <p className="text-secondary-foreground text-sm sm:text-base leading-relaxed">
+              Enterprise-grade AI applications built to solve complex automation and regulatory problems.
             </p>
           </ScrollReveal>
         </div>
 
-        {/* Interactive Gallery Slider Container w/ Fade Edges */}
-        <div
-          className="relative -mx-4 sm:mx-0 group/slider"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
+        {/* Featured Projects Grid (Apple Style) */}
+        <div className="space-y-24 md:space-y-40">
+          {featuredProjects.map((project, idx) => {
+            const isEven = idx % 2 === 0;
+            const targetLink = project.title === "EDITORIAL.IO" ? "/editorial" : project.link;
+            const isExternal = project.title !== "EDITORIAL.IO";
+            const hasResources = !!project.resources;
 
-          {/* Gallery Controls (Absolute Sides) */}
-          <div className="hidden md:flex absolute inset-y-0 -left-6 -right-6 items-center justify-between pointer-events-none z-20">
-            <button
-              onClick={() => slide('left')}
-              className="pointer-events-auto p-3 rounded-full bg-zinc-900/80 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-primary/50 text-white transition-all duration-500 shadow-xl group cursor-pointer"
-            >
-              <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
-            </button>
-            <button
-              onClick={() => slide('right')}
-              className="pointer-events-auto p-3 rounded-full bg-zinc-900/80 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-primary/50 text-white transition-all duration-500 shadow-xl group cursor-pointer"
-            >
-              <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
-            </button>
-          </div>
+            // Dynamically select theme specific assets (matches the portfolio theme style)
+            const projectImage = isLight 
+              ? (project.imageLight || project.image) 
+              : (project.imageDark || project.image);
 
-          <motion.div
-            ref={sliderRef}
-            onScroll={handleScroll}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-            className={`flex gap-8 sm:gap-12 lg:gap-16 overflow-x-auto snap-x snap-mandatory px-4 sm:px-12 pb-12 pt-8 hide-scrollbar select-none z-10 relative ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} items-center`}
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              scrollBehavior: 'smooth',
-            }}
-          >
-            {displayedProjects.map((project, idx) => (
-              <ProjectCard
-                key={`${project.id}-clone-${idx}`}
-                project={project}
-                index={idx}
-                isActive={(idx % baseProjects.length) === activeIndex}
-                onLearnMore={setSelectedProject}
-              />
-            ))}
-          </motion.div>
+            const isGovAI = project.title === "GovernanceAI";
+            const visualColSpan = "lg:col-span-6";
+            const textColSpan = "lg:col-span-6";
+            const frameMaxWidth = "max-w-[650px]";
+            const frameAspectRatio = "aspect-[16/9]";
+
+            return (
+              <div 
+                key={project.id} 
+                className="flex flex-col lg:grid lg:grid-cols-12 gap-10 lg:gap-16 items-center"
+              >
+                {/* Visual Column */}
+                <div className={`w-full ${visualColSpan} ${isEven ? "lg:order-2" : "lg:order-1"}`}>
+                  <Reveal delay={0.1} width="100%">
+                    <div className={`relative group mx-auto w-full ${frameMaxWidth}`}>
+                      {/* Premium Device Mockup Frame */}
+                      <div className={`relative ${frameAspectRatio} rounded-[20px] md:rounded-[26px] p-1 md:p-2 border transition-all duration-500 shadow-premium
+                        ${isLight 
+                          ? "bg-zinc-900 border-zinc-950 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)]" 
+                          : "bg-zinc-100 border-zinc-200/60 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7)]"
+                        }`}
+                      >
+                        {/* Screen Wrapper */}
+                        <div className={`relative w-full h-full overflow-hidden rounded-[16px] md:rounded-[22px] border transition-all duration-500
+                          ${isLight 
+                            ? "bg-black border-zinc-800" 
+                            : "bg-white border-zinc-300"
+                          }`}
+                        >
+                          {project.isComingSoon ? (
+                            <div className="relative w-full h-full bg-zinc-950 flex flex-col items-center justify-center overflow-hidden select-none">
+                              {/* Main Background Image - Launch Soon Banner */}
+                              <div 
+                                className="absolute inset-0 bg-cover bg-center opacity-90"
+                                style={{ backgroundImage: "url('/assets/launch-soon-bg.png')" }}
+                              />
+                              {/* Dark subtle overlay vignette */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-black/30 pointer-events-none" />
+
+                              {/* Overlaid Corner Timer (compact tactical widget) */}
+                              <div className="absolute bottom-3 right-3 w-[38%] h-[32%] max-w-[145px] max-h-[85px] bg-[#0c0d0e]/95 rounded-xl border border-white/10 shadow-2xl opacity-60 hover:opacity-100 transition-all duration-300 overflow-hidden z-20">
+                                <LaunchCountdown isLight={isLight} isMini={true} />
+                              </div>
+                            </div>
+                          ) : projectImage ? (
+                            <motion.img
+                              src={projectImage}
+                              alt={project.title}
+                              className="w-full h-full object-contain bg-transparent transition-transform duration-1000 ease-[0.16,1,0.3,1] group-hover:scale-[1.03]"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-transparent">
+                              <span className="text-secondary-foreground font-mono text-xs uppercase tracking-widest">No Preview</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </Reveal>
+                </div>
+
+                {/* Text Content Column */}
+                <div className={`w-full ${textColSpan} flex flex-col justify-center ${isEven ? "lg:order-1" : "lg:order-2"}`}>
+                  <Reveal delay={0.2}>
+                    <div className="space-y-6">
+                      
+                      {/* Category Label */}
+                      <span className="text-[10px] font-mono tracking-widest text-secondary-foreground uppercase font-bold flex items-center gap-2">
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        {project.category}
+                      </span>
+
+                      {/* Title */}
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-heading text-foreground">
+                        {project.title}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="text-secondary-foreground text-sm sm:text-base leading-relaxed font-body">
+                        {project.description}
+                      </p>
+
+                      {/* Highlights checklist */}
+                      {project.highlights && (
+                        <ul className="space-y-2.5 pt-2">
+                          {project.highlights.slice(0, 3).map((item, hIdx) => (
+                            <li key={hIdx} className="flex items-start gap-2.5 text-xs text-secondary-foreground font-body">
+                              <span className="text-muted-foreground mt-0.5 font-semibold font-mono">—</span>
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {/* CTAs */}
+                      <div className="flex flex-row flex-wrap items-center gap-4 pt-4">
+                        {hasResources ? (
+                          <>
+                            {/* Primary Button: Visit Website */}
+                            <Button
+                              as="a"
+                              href={project.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="primary"
+                              className="text-xs uppercase tracking-wider font-mono"
+                            >
+                              Visit Website <ArrowUpRight className="w-3.5 h-3.5" />
+                            </Button>
+                            {/* Secondary Button: Learn More */}
+                            <Button
+                              onClick={() => setActiveModalProject(project)}
+                              variant="outline"
+                              className="text-xs uppercase tracking-wider font-mono"
+                            >
+                              Learn More <ArrowRight className="w-3.5 h-3.5" />
+                            </Button>
+                          </>
+                        ) : isExternal ? (
+                          <Button
+                            as="a"
+                            href={targetLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="primary"
+                            className="text-xs uppercase tracking-wider font-mono"
+                          >
+                            View Case Study <ArrowUpRight className="w-3.5 h-3.5" />
+                          </Button>
+                        ) : (
+                          <Button
+                            as={Link}
+                            to={targetLink}
+                            variant="primary"
+                            className="text-xs uppercase tracking-wider font-mono"
+                          >
+                            View Case Study <ArrowRight className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
+                        {!hasResources && project.github && project.github !== "#" && (
+                          <Button
+                            as="a"
+                            href={project.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="outline"
+                            className="w-10 h-10 flex items-center justify-center p-0"
+                          >
+                            <Github className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+
+                    </div>
+                  </Reveal>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Show More Actions */}
-        <div className="flex justify-center mt-12 sm:mt-16">
+        {/* View All Projects Actions */}
+        <div className="flex justify-center mt-14 md:mt-20">
           <Link to="/projects">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="hover-glitch relative inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium rounded-full overflow-hidden group border border-primary/40 bg-transparent text-white transition-all duration-500 hover:shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.2)]"
-              data-text="View Full Projects Archive"
+            <Button
+              variant="outline"
+              size="lg"
+              className="text-xs uppercase font-semibold"
             >
-              <div className="absolute inset-0 bg-primary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out z-0" />
-              {/* Rotating Trace line */}
-              <div className="absolute inset-[-100%] z-[-1] overflow-hidden group-hover:animate-[spin_4s_linear_infinite] opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                <div className="w-full h-full bg-[conic-gradient(from_0deg,transparent_0_340deg,rgba(var(--color-primary-rgb),0.8)_360deg)]" />
-              </div>
-              <div className="absolute inset-[1px] bg-zinc-950 rounded-full z-0 pointer-events-none group-hover:bg-zinc-950/80 transition-colors duration-500" />
-
-              <span className="hover-glitch-text relative z-10 flex items-center gap-2 font-heading tracking-wide">
-                View Full Projects Archive <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
-              </span>
-            </motion.button>
+              View All Projects <ArrowRight className="w-3.5 h-3.5" />
+            </Button>
           </Link>
         </div>
+
       </div>
 
-      {/* Expanded Modal */}
-      {selectedProject && (
-        <ProjectModal
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-        />
-      )}
+      {/* PREMIUM RESOURCE LINKS DIALOG MODAL */}
+      <AnimatePresence>
+        {activeModalProject && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Dark blur overlay */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-background/80 backdrop-blur-md"
+              onClick={() => setActiveModalProject(null)}
+            />
+
+            {/* Modal Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-md bg-card border border-border rounded-3xl p-6 md:p-8 shadow-premium overflow-hidden z-10"
+            >
+              {/* Top Row */}
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-secondary-foreground font-bold">
+                    Resources Hub
+                  </span>
+                  <h4 className="text-xl font-bold text-foreground font-heading mt-1">
+                    {activeModalProject.title}
+                  </h4>
+                </div>
+                <button
+                  onClick={() => setActiveModalProject(null)}
+                  className="p-1.5 border border-border hover:border-border-hover bg-secondary/50 text-secondary-foreground hover:text-foreground rounded-full transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Resources Link Grid */}
+              <div className="space-y-3">
+                <a
+                  href={activeModalProject.resources.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-secondary border border-border hover:border-border-hover hover:bg-secondary/80 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-card border border-border/50 flex items-center justify-center text-secondary-foreground group-hover:text-foreground">
+                      <ExternalLink className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-foreground">Live Website</div>
+                      <div className="text-[10px] text-secondary-foreground">Deploy to production environment</div>
+                    </div>
+                  </div>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-secondary-foreground group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </a>
+
+                <a
+                  href={activeModalProject.resources.caseStudies}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-secondary border border-border hover:border-border-hover hover:bg-secondary/80 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-card border border-border/50 flex items-center justify-center text-secondary-foreground group-hover:text-foreground">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-foreground">Case Studies</div>
+                      <div className="text-[10px] text-secondary-foreground">Platform vision and architecture deep dive</div>
+                    </div>
+                  </div>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-secondary-foreground group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </a>
+
+                <a
+                  href={activeModalProject.resources.blog}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-secondary border border-border hover:border-border-hover hover:bg-secondary/80 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-card border border-border/50 flex items-center justify-center text-secondary-foreground group-hover:text-foreground">
+                      <BookOpen className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-foreground">Technical Blog</div>
+                      <div className="text-[10px] text-secondary-foreground">Implementation thoughts and milestones</div>
+                    </div>
+                  </div>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-secondary-foreground group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </a>
+
+                <a
+                  href={activeModalProject.resources.video}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-secondary border border-border hover:border-border-hover hover:bg-secondary/80 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-card border border-border/50 flex items-center justify-center text-secondary-foreground group-hover:text-foreground">
+                      <Play className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-foreground">Product Video</div>
+                      <div className="text-[10px] text-secondary-foreground">Autonomous orchestrator runtime walkthrough</div>
+                    </div>
+                  </div>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-secondary-foreground group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </a>
+
+                {activeModalProject.resources.github && (
+                  <a
+                    href={activeModalProject.resources.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-3.5 rounded-2xl bg-secondary border border-border hover:border-border-hover hover:bg-secondary/80 transition-all group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-card border border-border/50 flex items-center justify-center text-secondary-foreground group-hover:text-foreground">
+                        <Github className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-foreground">GitHub Repository</div>
+                        <div className="text-[10px] text-secondary-foreground">Inspect backend agent architecture and pipelines</div>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-secondary-foreground group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </a>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
     </section>
   );
 };

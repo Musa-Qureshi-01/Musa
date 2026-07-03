@@ -1,89 +1,624 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
     ArrowUpRight, Github, Play, FileText, ExternalLink,
-    ArrowLeft, X, ChevronRight, BookOpen,
+    ArrowLeft, X, ChevronRight, BookOpen, Sparkles, ArrowRight,
+    Star, GitFork, Code2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { portfolioData } from "@/data/portfolio";
 import { FadeIn } from "@/components/Reveal";
+import { Button } from "@/components/Button";
 
 // ─── Category Definitions ──────────────────────────────────────────────────
 const CATEGORIES = [
-    { id: "all", label: "All Projects" },
-    { id: "ongoing", label: "Ongoing" },
-    { id: "agentic", label: "Agentic/GenAI" },
-    { id: "mldl", label: "ML/DL/Data" },
-    { id: "others", label: "Others" },
-    { id: "resources", label: "Resources & Learnings" },
+    { id: "featured", label: "Featured" },
+    { id: "agentic", label: "AI Systems" },
+    { id: "mldl", label: "ML / Data" },
+    { id: "software", label: "Web / SW Development" },
+    { id: "research", label: "Research & Learning" },
 ];
 
-const AGENTIC_CATS = ["Healthcare AI", "Agentic AI & FinTech", "GenAI & Content", "AI Tooling & Orchestration"];
-const MLDL_CATS = ["Computer Vision & Civic Tech", "ML/DL Engineering"];
-const OTHERS_CATS = ["Interactive AI Research", "Full-Stack Web", "Frontend & Design"];
-const isOngoing = (p) => p.link === "#" && p.github === "#";
+const AGENTIC_CATS = [
+    "Healthcare AI", 
+    "Agentic AI & FinTech", 
+    "AI Security & Governance", 
+    "AI-Native Collaborative Documentation Platform", 
+    "AI Tooling & Orchestration",
+    "AI-Powered Public Governance"
+];
 
-const filterProjects = (projects, catId) => {
-    switch (catId) {
-        case "all": return projects;
-        case "ongoing": return projects.filter(isOngoing);
-        case "agentic": return projects.filter(p => AGENTIC_CATS.includes(p.category));
-        case "mldl": return projects.filter(p => MLDL_CATS.includes(p.category));
-        case "others": return projects.filter(p => OTHERS_CATS.includes(p.category));
-        default: return projects;
-    }
+const MLDL_CATS = [
+    "Computer Vision & Civic Tech",
+    "ML/DL Engineering",
+    "AI-Powered Public Governance",
+    "Interactive AI Research"
+];
+
+const SWE_CATS = [
+    "Full-Stack Web", 
+    "Frontend & Design"
+];
+
+const RESOURCE_STYLES = {
+    Github: { border: "border-zinc-500/20", badge: "bg-zinc-500/10 text-zinc-600 dark:text-zinc-300", Icon: Github },
+    Notion: { border: "border-violet-500/20", badge: "bg-violet-500/10 text-violet-600 dark:text-violet-300", Icon: BookOpen },
+    PDF: { border: "border-rose-500/20", badge: "bg-rose-500/10 text-rose-600 dark:text-rose-300", Icon: FileText },
+    Medium: { border: "border-[#02b875]/20", badge: "bg-[#02b875]/10 text-[#02b875]", Icon: BookOpen },
+    Codeforces: { border: "border-[#f89f1b]/20", badge: "bg-[#f89f1b]/10 text-[#f89f1b]", Icon: Code2 },
 };
 
-// --- Modern Vertical Category Navigation ---
-const VerticalCategoryNav = ({ categories, activeId, onChange }) => {
+// ─── Launch Countdown Component ─────────────────────────────────────────────
+const LaunchCountdown = ({ isLight, isMini = false }) => {
+  const [timeLeft, setTimeLeft] = useState({ days: 12, hours: 8, minutes: 45, seconds: 12 });
+
+  useEffect(() => {
+    const targetDate = new Date("2026-07-15T00:00:00").getTime();
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference <= 0) {
+        clearInterval(interval);
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      } else {
+        const d = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((difference % (1000 * 60)) / 1000);
+        setTimeLeft({ days: d, hours: h, minutes: m, seconds: s });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatNumber = (num) => String(num).padStart(2, "0");
+
+  if (isMini) {
     return (
-        <div className="flex flex-col w-full py-4 space-y-1">
-            {categories.map((cat) => {
-                const isActive = cat.id === activeId;
-                return (
-                    <button
-                        key={cat.id}
-                        onClick={() => onChange(cat.id)}
-                        className={`group relative flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-left ${isActive
-                            ? "bg-primary/10 text-primary"
-                            : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
-                            }`}
-                    >
-                        {/* Active Indicator Line */}
-                        {isActive && (
-                            <motion.div
-                                layoutId="activeCategory"
-                                className="absolute left-0 w-1 h-6 bg-primary rounded-full"
-                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            />
-                        )}
-
-                        <div className="flex flex-col">
-                            <span className={`text-sm font-bold font-heading tracking-wide transition-colors ${isActive ? "text-primary" : "text-inherit"}`}>
-                                {cat.label}
-                            </span>
-                            {/* Optional: Add brief counts or subtext if needed */}
-                        </div>
-
-                        {isActive && (
-                            <motion.div
-                                initial={{ opacity: 0, x: -5 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="ml-auto"
-                            >
-                                <ChevronRight className="w-4 h-4" />
-                            </motion.div>
-                        )}
-                    </button>
-                );
-            })}
+      <div className="w-full h-full flex flex-col items-center justify-center p-2 font-mono relative overflow-hidden bg-[#0c0d0e]/95 text-white select-none">
+        <div className="mb-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[7px] font-bold tracking-widest uppercase border bg-white/5 border-white/10 text-zinc-400 relative z-10">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Launching Soon
         </div>
+        <div className="flex gap-1 text-[10px] sm:text-xs font-extrabold relative z-10 text-white">
+          <span>{formatNumber(timeLeft.days)}d</span>
+          <span className="text-zinc-500">:</span>
+          <span>{formatNumber(timeLeft.hours)}h</span>
+          <span className="text-zinc-500">:</span>
+          <span>{formatNumber(timeLeft.minutes)}m</span>
+          <span className="text-zinc-500">:</span>
+          <span>{formatNumber(timeLeft.seconds)}s</span>
+        </div>
+        <div className="text-[6px] tracking-[0.12em] mt-1 text-zinc-500 relative z-10 uppercase">
+          T-Minus Deployment
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center p-6 md:p-8 font-mono relative overflow-hidden bg-black text-white">
+      <div 
+        className="absolute inset-0 bg-cover bg-center opacity-25 pointer-events-none mix-blend-screen"
+        style={{ backgroundImage: "url('/assets/launch-soon-bg.png')" }}
+      />
+      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+
+      <div className="mb-3 md:mb-5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] md:text-[11px] font-bold tracking-widest uppercase border bg-white/5 border-white/10 text-zinc-300 relative z-10">
+        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        Launching Soon
+      </div>
+
+      <h4 className="text-[10px] md:text-[12px] font-bold tracking-[0.2em] uppercase mb-4 md:mb-5 text-center text-zinc-400 relative z-10">
+        EDITORIAL.IO DEPLOYMENT TIMER
+      </h4>
+
+      <div className="grid grid-cols-4 gap-4 md:gap-6 max-w-sm md:max-w-md relative z-10">
+        {[
+          { label: "DAYS", value: timeLeft.days },
+          { label: "HOURS", value: timeLeft.hours },
+          { label: "MINS", value: timeLeft.minutes },
+          { label: "SECS", value: timeLeft.seconds },
+        ].map((unit, idx) => (
+          <div key={idx} className="flex flex-col items-center">
+            <div className="w-14 h-18 md:w-20 md:h-24 rounded-lg md:rounded-xl border flex items-center justify-center text-xl md:text-3xl font-extrabold shadow-lg bg-black/60 border-white/15 text-white backdrop-blur-sm">
+              {formatNumber(unit.value)}
+            </div>
+            <span className="text-[9px] md:text-[10px] font-bold tracking-wider mt-2.5 text-zinc-400">
+              {unit.label}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="w-full max-w-[240px] md:max-w-[300px] mt-6 md:mt-8 font-sans relative z-10">
+        <div className="flex justify-between items-center text-[9px] md:text-[10px] font-bold text-zinc-400 tracking-wider mb-2">
+          <span>PIPELINE BUILD</span>
+          <span>92%</span>
+        </div>
+        <div className="w-full h-1.5 md:h-2 rounded-full overflow-hidden bg-white/10">
+          <div 
+            className="h-full rounded-full bg-white transition-all duration-500" 
+            style={{ width: "92%" }} 
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Resource Card Component ────────────────────────────────────────────────
+const ResourceCard = ({ item, idx }) => {
+    const isGithub = item.type.toLowerCase() === "github";
+    const hasLink = item.link && item.link !== "#";
+    const Tag = hasLink ? "a" : "div";
+    const tagProps = hasLink ? { href: item.link, target: "_blank", rel: "noopener noreferrer" } : {};
+
+    // Parse repository name from link
+    let defaultOwner = "Musa-Qureshi-01";
+    let defaultRepo = item.title.replace(/\s+/g, "-");
+    if (hasLink) {
+        try {
+            const url = new URL(item.link);
+            const pathParts = url.pathname.split("/").filter(Boolean);
+            if (pathParts.length >= 2) {
+                defaultOwner = pathParts[0];
+                defaultRepo = pathParts[1];
+            }
+        } catch (e) {}
+    }
+
+    const [stats, setStats] = useState({ 
+        stars: null, 
+        forks: null, 
+        language: "Python",
+        owner: defaultOwner,
+        repo: defaultRepo
+    });
+
+    useEffect(() => {
+        if (!isGithub || !item.link || item.link === "#") return;
+        try {
+            const url = new URL(item.link);
+            const pathParts = url.pathname.split("/").filter(Boolean);
+            if (pathParts.length >= 2) {
+                const owner = pathParts[0];
+                const repo = pathParts[1];
+                fetch(`https://api.github.com/repos/${owner}/${repo}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.stargazers_count !== undefined) {
+                            setStats({
+                                stars: data.stargazers_count,
+                                forks: data.forks_count,
+                                language: data.language || "Python",
+                                owner,
+                                repo
+                            });
+                        }
+                    })
+                    .catch(() => {});
+            }
+        } catch (e) {}
+    }, [isGithub, item.link]);
+
+    if (isGithub) {
+        return (
+            <FadeIn delay={idx * 0.05}>
+                <Tag {...tagProps}
+                    className="group relative flex flex-col h-full bg-card border border-border hover:border-border-hover rounded-2xl p-6 transition-all duration-300 hover:shadow-premium-hover cursor-pointer"
+                >
+                    {/* Repository Header */}
+                    <div className="flex items-center justify-between gap-2 mb-4">
+                        <div className="flex items-center gap-2">
+                            <Github className="w-5 h-5 text-secondary-foreground group-hover:text-primary transition-colors duration-300" />
+                            <div className="text-xs font-mono tracking-tight text-secondary-foreground leading-none">
+                                <span className="opacity-50">{stats.owner}</span>
+                                <span className="opacity-40 px-1">/</span>
+                                <span className="font-extrabold text-foreground group-hover:text-primary transition-colors duration-300">{stats.repo}</span>
+                            </div>
+                        </div>
+                        <ArrowUpRight className="w-4 h-4 text-secondary-foreground/60 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-xs text-secondary-foreground leading-relaxed flex-grow mb-6 font-body">
+                        {item.description}
+                    </p>
+
+                    {/* Repository Footer Metadata */}
+                    <div className="flex items-center gap-4 pt-4 border-t border-border mt-auto">
+                        {/* Language */}
+                        <div className="flex items-center gap-1.5 text-[10px] font-mono text-secondary-foreground">
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#3572A5]" />
+                            <span>{stats.language}</span>
+                        </div>
+                        {/* Stars */}
+                        <div className="flex items-center gap-1 text-[10px] font-mono text-secondary-foreground">
+                            <Star className="w-3.5 h-3.5 fill-current text-amber-500" />
+                            <span>{stats.stars !== null ? stats.stars : "—"}</span>
+                        </div>
+                        {/* Forks */}
+                        <div className="flex items-center gap-1 text-[10px] font-mono text-secondary-foreground">
+                            <GitFork className="w-3.5 h-3.5" />
+                            <span>{stats.forks !== null ? stats.forks : "—"}</span>
+                        </div>
+                    </div>
+                </Tag>
+            </FadeIn>
+        );
+    }
+
+    // Fallback for non-github resources (Notion, PDF etc.)
+    const s = RESOURCE_STYLES[item.type] ?? RESOURCE_STYLES.PDF;
+    return (
+        <FadeIn delay={idx * 0.05}>
+            <Tag {...tagProps}
+                className={`group flex flex-col h-full bg-card border border-border rounded-2xl p-5 transition-all duration-300 hover:border-border-hover hover:shadow-premium-hover ${hasLink ? "cursor-pointer" : "cursor-default opacity-75"}`}
+            >
+                <div className="flex items-start justify-between mb-3">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-bold tracking-wider uppercase ${s.badge}`}>
+                        <s.Icon className="w-3.5 h-3.5" /> {item.type}
+                    </span>
+                    {hasLink && <ArrowUpRight className="w-3.5 h-3.5 text-secondary-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />}
+                </div>
+                <h3 className="text-sm font-bold font-heading text-foreground group-hover:text-primary transition-colors mb-2 leading-snug">{item.title}</h3>
+                <p className="text-xs text-secondary-foreground leading-relaxed line-clamp-3 flex-grow mb-3">{item.description}</p>
+                <div className="flex flex-wrap gap-1.5 mt-auto">
+                    {item.tags?.map((t, i) => <span key={i} className="text-[9px] px-2 py-0.5 rounded bg-secondary border border-border text-secondary-foreground font-mono">{t}</span>)}
+                </div>
+                {!hasLink && <p className="text-[9px] text-muted-foreground mt-3 italic">Link coming soon</p>}
+            </Tag>
+        </FadeIn>
     );
 };
 
+// ─── Flagship Project Spread (Editorial Panel) ──────────────────────────────
+const FlagshipSpread = ({ project, idx, onLearnMore, isLight }) => {
+    const isEven = idx % 2 === 0;
+    const projectImage = isLight 
+      ? (project.imageLight || project.image) 
+      : (project.imageDark || project.image);
+
+    const cardRef = useRef(null);
+    const [coords, setCoords] = useState({ x: 0, y: 0 });
+
+    const handleMouseMove = (e) => {
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        setCoords({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        });
+    };
+
+    return (
+        <motion.div
+            ref={cardRef}
+            onMouseMove={handleMouseMove}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: idx * 0.1 }}
+            className="group relative w-full bg-card rounded-[24px] border border-border p-6 md:p-10 lg:p-12 overflow-hidden shadow-premium hover:shadow-premium-hover hover:border-border-hover transition-all duration-500"
+        >
+            {/* Spotlight reflection sheen */}
+            <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+                style={{
+                    background: `radial-gradient(600px circle at ${coords.x}px ${coords.y}px, ${
+                        isLight ? "rgba(9, 9, 9, 0.02)" : "rgba(255, 255, 255, 0.04)"
+                    }, transparent 80%)`
+                }}
+            />
+
+            <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-16 items-center">
+                {/* Image bezel column */}
+                <div className={`w-full lg:col-span-7 ${isEven ? "lg:order-2" : "lg:order-1"}`}>
+                    <div className="relative group/mockup overflow-hidden rounded-[16px]">
+                        <div className={`relative aspect-[16/10] rounded-[18px] p-1 border transition-all duration-500 shadow-xl
+                            ${isLight 
+                                ? "bg-zinc-900 border-zinc-950" 
+                                : "bg-zinc-100 border-zinc-200/60"
+                            }`}
+                        >
+                            <div className={`relative w-full h-full overflow-hidden rounded-[12px] border transition-all duration-500
+                                ${isLight 
+                                    ? "bg-black border-zinc-800" 
+                                    : "bg-white border-zinc-300"
+                                }`}
+                            >
+                                {project.isComingSoon ? (
+                                    <div className="relative w-full h-full bg-zinc-950 flex flex-col items-center justify-center overflow-hidden select-none">
+                                        {/* Main Background Image - Launch Soon Banner */}
+                                        <div 
+                                            className="absolute inset-0 bg-cover bg-center opacity-90"
+                                            style={{ backgroundImage: "url('/assets/launch-soon-bg.png')" }}
+                                        />
+                                        {/* Dark subtle overlay vignette */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-black/30 pointer-events-none" />
+
+                                        {/* Overlaid Corner Timer (compact tactical widget) */}
+                                        <div className="absolute bottom-3 right-3 w-[38%] h-[32%] max-w-[145px] max-h-[85px] bg-[#0c0d0e]/95 rounded-xl border border-white/10 shadow-2xl opacity-90 hover:opacity-100 transition-all duration-300 overflow-hidden z-20">
+                                            <LaunchCountdown isLight={isLight} isMini={true} />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <img 
+                                        src={projectImage} 
+                                        alt={project.title} 
+                                        className="w-full h-full object-contain bg-transparent transition-transform duration-700 group-hover/mockup:scale-[1.02]" 
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Typography content column */}
+                <div className={`w-full lg:col-span-5 flex flex-col justify-center ${isEven ? "lg:order-1" : "lg:order-2"}`}>
+                    <span className="text-[10px] font-mono tracking-[0.2em] text-primary uppercase font-bold mb-3.5 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" />
+                        Flagship Platform
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground font-heading tracking-tight mb-4">
+                        {project.title}
+                    </h2>
+                    <p className="text-secondary-foreground text-sm sm:text-base leading-relaxed mb-6 font-body">
+                        {project.description}
+                    </p>
+                    
+                    {project.highlights && (
+                        <ul className="space-y-3 mb-8">
+                            {project.highlights.slice(0, 3).map((h, i) => (
+                                <li key={i} className="text-xs text-secondary-foreground flex items-start gap-2.5 leading-relaxed font-body">
+                                    <span className="text-muted-foreground mt-0.5 font-semibold font-mono">—</span>
+                                    <span>{h}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+
+                    <div className="flex items-center gap-5">
+                        <Button variant="primary" onClick={() => onLearnMore(project)} className="text-xs uppercase tracking-wider">
+                            Explore Product <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                        </Button>
+                        {project.link && project.link !== "#" && (
+                            <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-secondary-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors">
+                                Launch Site <ArrowUpRight className="w-3.5 h-3.5" />
+                            </a>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
+
+// ─── Supporting Project Card ────────────────────────────────────────────────
+const SupportingCard = ({ project, idx, onLearnMore, isLight }) => {
+    const isGithubCard = project.isGithubCard;
+    const projectImage = isLight 
+      ? (project.imageLight || project.image) 
+      : (project.imageDark || project.image);
+
+    // Parse owner and repo name from link
+    let defaultOwner = "Musa-Qureshi-01";
+    let defaultRepo = project.title.replace(/\s+/g, "-");
+    if (project.github && project.github !== "#") {
+        try {
+            const url = new URL(project.github);
+            const pathParts = url.pathname.split("/").filter(Boolean);
+            if (pathParts.length >= 2) {
+                defaultOwner = pathParts[0];
+                defaultRepo = pathParts[1];
+            }
+        } catch (e) {}
+    }
+
+    const [stats, setStats] = useState({ 
+        stars: null, 
+        forks: null, 
+        language: "Python",
+        owner: defaultOwner,
+        repo: defaultRepo
+    });
+
+    useEffect(() => {
+        if (!isGithubCard || !project.github || project.github === "#") return;
+        try {
+            const url = new URL(project.github);
+            const pathParts = url.pathname.split("/").filter(Boolean);
+            if (pathParts.length >= 2) {
+                const owner = pathParts[0];
+                const repo = pathParts[1];
+                fetch(`https://api.github.com/repos/${owner}/${repo}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.stargazers_count !== undefined) {
+                            setStats({
+                                stars: data.stargazers_count,
+                                forks: data.forks_count,
+                                language: data.language || "Python",
+                                owner,
+                                repo
+                            });
+                        }
+                    })
+                    .catch(() => {});
+            }
+        } catch (e) {}
+    }, [isGithubCard, project.github]);
+
+    const cardRef = useRef(null);
+    const [coords, setCoords] = useState({ x: 0, y: 0 });
+
+    const handleMouseMove = (e) => {
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        setCoords({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    };
+
+    if (isGithubCard) {
+        return (
+            <motion.div
+                ref={cardRef}
+                onMouseMove={handleMouseMove}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: idx * 0.05 }}
+                className="group relative bg-card rounded-2xl border border-border p-6 flex flex-col justify-between overflow-hidden shadow-premium hover:shadow-premium-hover hover:border-border-hover transition-all duration-500 h-full cursor-pointer"
+                onClick={() => {
+                    if (project.github && project.github !== "#") {
+                        window.open(project.github, "_blank", "noopener,noreferrer");
+                    }
+                }}
+            >
+                <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                        background: `radial-gradient(350px circle at ${coords.x}px ${coords.y}px, ${
+                            isLight ? "rgba(9, 9, 9, 0.015)" : "rgba(255, 255, 255, 0.03)"
+                        }, transparent 80%)`
+                    }}
+                />
+
+                <div className="relative z-10 flex flex-col h-full gap-4">
+                    {/* Repository Header */}
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <Github className="w-5 h-5 text-secondary-foreground group-hover:text-primary transition-colors duration-300" />
+                            <div className="text-xs font-mono tracking-tight text-secondary-foreground leading-none">
+                                <span className="opacity-50">{stats.owner}</span>
+                                <span className="opacity-40 px-1">/</span>
+                                <span className="font-extrabold text-foreground group-hover:text-primary transition-colors duration-300">{stats.repo}</span>
+                            </div>
+                        </div>
+                        <ArrowUpRight className="w-4 h-4 text-secondary-foreground/60 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-xs text-secondary-foreground leading-relaxed flex-grow font-body">
+                        {project.description}
+                    </p>
+
+                    {/* Footer Row */}
+                    <div className="flex items-center justify-between pt-4 border-t border-border mt-auto">
+                        <div className="flex items-center gap-4">
+                            {/* Language */}
+                            <div className="flex items-center gap-1.5 text-[10px] font-mono text-secondary-foreground">
+                                <span className="w-2.5 h-2.5 rounded-full bg-[#3572A5]" />
+                                <span>{stats.language}</span>
+                            </div>
+                            {/* Stars */}
+                            <div className="flex items-center gap-1 text-[10px] font-mono text-secondary-foreground">
+                                <Star className="w-3.5 h-3.5 fill-current text-amber-500" />
+                                <span>{stats.stars !== null ? stats.stars : "—"}</span>
+                            </div>
+                            {/* Forks */}
+                            <div className="flex items-center gap-1 text-[10px] font-mono text-secondary-foreground">
+                                <GitFork className="w-3.5 h-3.5" />
+                                <span>{stats.forks !== null ? stats.forks : "—"}</span>
+                            </div>
+                        </div>
+                        
+                        {/* Explore CTA */}
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onLearnMore(project);
+                            }}
+                            className="text-xs font-semibold text-secondary-foreground hover:text-primary flex items-center gap-1 transition-colors group/btn z-20"
+                        >
+                            Explore <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                        </button>
+                    </div>
+                </div>
+            </motion.div>
+        );
+    }
+
+    return (
+        <motion.div
+            ref={cardRef}
+            onMouseMove={handleMouseMove}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: idx * 0.05 }}
+            className="group relative bg-card rounded-2xl border border-border p-5 flex flex-col justify-between overflow-hidden shadow-premium hover:shadow-premium-hover hover:border-border-hover transition-all duration-500 h-full"
+        >
+            <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                style={{
+                    background: `radial-gradient(350px circle at ${coords.x}px ${coords.y}px, ${
+                        isLight ? "rgba(9, 9, 9, 0.015)" : "rgba(255, 255, 255, 0.03)"
+                    }, transparent 80%)`
+                }}
+            />
+
+            <div className="relative z-10 flex flex-col h-full gap-4">
+                {projectImage && (
+                    <div className="w-full p-4 border-b border-border bg-secondary/15 rounded-xl shrink-0 flex items-center justify-center relative overflow-hidden">
+                        <div className={`relative w-full aspect-[16/10] rounded-xl p-0.5 border transition-all duration-500 shadow-md
+                            ${isLight ? "bg-zinc-900 border-zinc-950" : "bg-zinc-100 border-zinc-200/60"}`}
+                        >
+                            <div className={`relative w-full h-full overflow-hidden rounded-[10px] border transition-all duration-500
+                                ${isLight ? "bg-black border-zinc-800" : "bg-white border-zinc-300"}`}
+                            >
+                                <img 
+                                    src={projectImage} 
+                                    alt={project.title} 
+                                    className="w-full h-full object-contain bg-transparent transition-transform duration-700 group-hover:scale-[1.03]" 
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <div className="flex flex-col flex-grow justify-between">
+                    <div>
+                        <div className="mb-2">
+                            <span className="inline-block px-2 py-0.5 bg-secondary text-secondary-foreground text-[8px] font-bold tracking-wider uppercase rounded border border-border">
+                                {project.category}
+                            </span>
+                        </div>
+                        <h3 className="text-base font-bold text-foreground font-heading group-hover:text-primary transition-colors leading-tight mb-2">
+                            {project.title}
+                        </h3>
+                        <p className="text-xs text-secondary-foreground leading-relaxed mb-4 font-body line-clamp-2">
+                            {project.description}
+                        </p>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t border-border mt-auto">
+                        <button onClick={() => onLearnMore(project)} className="text-xs font-semibold text-secondary-foreground hover:text-primary flex items-center gap-1 transition-colors group/btn">
+                            Explore <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                        </button>
+                        <div className="flex gap-1">
+                            {project.link && project.link !== "#" && (
+                                <a href={project.link} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg border border-transparent hover:border-border hover:bg-secondary text-secondary-foreground hover:text-primary transition-all duration-300">
+                                    <ExternalLink className="w-3.5 h-3.5" />
+                                </a>
+                            )}
+                            {project.github && project.github !== "#" && (
+                                <a href={project.github} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg border border-transparent hover:border-border hover:bg-secondary text-secondary-foreground hover:text-foreground transition-all duration-300">
+                                    <Github className="w-3.5 h-3.5" />
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
 
 // ─── Learn-More Modal ───────────────────────────────────────────────────────
-const ProjectModal = ({ project, onClose }) => {
+const ProjectModal = ({ project, onClose, isLight }) => {
+    const projectImage = isLight 
+      ? (project.imageLight || project.image) 
+      : (project.imageDark || project.image);
     useEffect(() => {
         document.body.style.overflow = "hidden";
         const onKey = (e) => e.key === "Escape" && onClose();
@@ -97,33 +632,76 @@ const ProjectModal = ({ project, onClose }) => {
                 <motion.div
                     initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }}
                     transition={{ type: "spring", damping: 26, stiffness: 300 }}
-                    className="relative w-full max-w-3xl bg-zinc-950 border border-white/10 rounded-3xl shadow-2xl overflow-hidden pointer-events-auto max-h-[88vh] flex flex-col"
+                    className="relative w-full max-w-3xl bg-card border border-border rounded-3xl shadow-2xl overflow-hidden pointer-events-auto max-h-[88vh] flex flex-col"
                 >
-                    <button onClick={onClose} className="absolute top-4 right-4 z-20 p-2 bg-black/50 hover:bg-black/80 rounded-full text-zinc-400 hover:text-white border border-white/10 hover:border-white/30 transition-colors">
+                    <button onClick={onClose} className="absolute top-4 right-4 z-20 p-2 bg-secondary/80 hover:bg-secondary rounded-full text-secondary-foreground hover:text-foreground border border-border transition-colors">
                         <X className="w-5 h-5" />
                     </button>
                     <div className="overflow-y-auto flex-grow">
-                        {project.image && (
-                            <div className="w-full h-52 lg:h-72 relative bg-zinc-900 border-b border-white/10 shrink-0">
-                                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent z-10" />
-                                <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+                        {project.isComingSoon ? (
+                            <div className="w-full p-6 sm:p-8 bg-zinc-900/40 border-b border-white/5 flex items-center justify-center shrink-0">
+                                <div className={`relative w-full max-w-[480px] aspect-[16/10] rounded-[18px] p-1 border transition-all duration-500 shadow-lg
+                                    ${isLight 
+                                        ? "bg-zinc-900 border-zinc-950" 
+                                        : "bg-zinc-100 border-zinc-200/60"
+                                    }`}
+                                >
+                                    <div className={`relative w-full h-full overflow-hidden rounded-[12px] border transition-all duration-500
+                                        ${isLight 
+                                            ? "bg-black border-zinc-800" 
+                                            : "bg-white border-zinc-300"
+                                        }`}
+                                    >
+                                        <div className="relative w-full h-full bg-zinc-950 flex flex-col items-center justify-center overflow-hidden select-none">
+                                            <div 
+                                                className="absolute inset-0 bg-cover bg-center opacity-90"
+                                                style={{ backgroundImage: "url('/assets/launch-soon-bg.png')" }}
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-black/30 pointer-events-none" />
+
+                                            <div className="absolute bottom-3 right-3 w-[38%] h-[32%] max-w-[145px] max-h-[85px] bg-[#0c0d0e]/95 rounded-xl border border-white/10 shadow-2xl opacity-60 hover:opacity-100 transition-all duration-300 overflow-hidden z-20">
+                                                <LaunchCountdown isLight={isLight} isMini={true} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        )}
-                        {!project.image && (
-                            <div className="w-full h-28 bg-gradient-to-br from-primary/10 via-zinc-900 to-black border-b border-white/10 flex items-center px-8">
-                                {isOngoing(project) && <span className="text-[9px] font-bold tracking-widest uppercase text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-1 rounded-full">In Progress</span>}
+                        ) : projectImage ? (
+                            <div className="w-full p-6 sm:p-8 bg-zinc-900/40 border-b border-white/5 flex items-center justify-center shrink-0">
+                                <div className={`relative w-full max-w-[480px] aspect-[16/10] rounded-[18px] p-1 border transition-all duration-500 shadow-lg
+                                    ${isLight 
+                                        ? "bg-zinc-900 border-zinc-950" 
+                                        : "bg-zinc-100 border-zinc-200/60"
+                                    }`}
+                                >
+                                    <div className={`relative w-full h-full overflow-hidden rounded-[12px] border transition-all duration-500
+                                        ${isLight 
+                                            ? "bg-black border-zinc-800" 
+                                            : "bg-white border-zinc-300"
+                                        }`}
+                                    >
+                                        <img 
+                                            src={projectImage} 
+                                            alt={project.title} 
+                                            className="w-full h-full object-contain bg-transparent" 
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="w-full h-28 bg-gradient-to-br from-primary/5 via-secondary to-background border-b border-border flex items-center px-8">
                             </div>
                         )}
                         <div className="p-6 sm:p-8 lg:p-10">
                             <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">{project.category}</p>
-                            <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-white mb-4">{project.title}</h2>
-                            <p className="text-zinc-300 leading-relaxed text-sm sm:text-base mb-8">{project.description}</p>
+                            <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-foreground mb-4">{project.title}</h2>
+                            <p className="text-secondary-foreground leading-relaxed text-sm sm:text-base mb-8">{project.description}</p>
                             {project.highlights?.length > 0 && (
                                 <div className="mb-8 pl-4 border-l-2 border-primary/40">
-                                    <p className="text-white text-sm font-semibold mb-3">Key Highlights</p>
+                                    <p className="text-foreground text-sm font-semibold mb-3">Key Highlights</p>
                                     <ul className="space-y-2">
                                         {project.highlights.map((h, i) => (
-                                            <li key={i} className="text-zinc-400 text-sm leading-relaxed flex gap-2">
+                                            <li key={i} className="text-secondary-foreground text-sm leading-relaxed flex gap-2">
                                                 <ChevronRight className="w-4 h-4 text-primary/60 mt-0.5 flex-shrink-0" />{h}
                                             </li>
                                         ))}
@@ -131,14 +709,36 @@ const ProjectModal = ({ project, onClose }) => {
                                 </div>
                             )}
                             <div className="mb-8">
-                                <p className="text-white text-sm font-semibold mb-3">Tech Stack</p>
-                                <div className="flex flex-wrap gap-2">{project.tech.map((t, i) => <span key={i} className="text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-zinc-300">{t}</span>)}</div>
+                                <p className="text-foreground text-sm font-semibold mb-3">Tech Stack</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {project.tech.map((t, i) => (
+                                        <span key={i} className="text-xs px-3 py-1.5 rounded-lg bg-secondary border border-border text-secondary-foreground font-mono">
+                                            {t}
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-white/10">
-                                {project.link && project.link !== "#" && <a href={project.link} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 text-sm font-medium transition-all">Live Demo <ExternalLink className="w-4 h-4" /></a>}
-                                {project.github && project.github !== "#" && <a href={project.github} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-zinc-300 hover:border-white/30 hover:text-white text-sm font-medium transition-all">GitHub <Github className="w-4 h-4" /></a>}
-                                {project.video && <a href={project.video} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-950/30 border border-blue-900/40 text-blue-400 hover:border-blue-500 text-sm font-medium transition-all">Demo Video <Play className="w-4 h-4" /></a>}
-                                {project.article && <a href={project.article} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 hover:border-emerald-500 text-sm font-medium transition-all">Article <FileText className="w-4 h-4" /></a>}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-border">
+                                {project.link && project.link !== "#" && (
+                                    <Button as="a" href={project.link} target="_blank" rel="noopener noreferrer" variant="primary" className="text-xs uppercase tracking-wider">
+                                        Live Demo <ExternalLink className="w-4 h-4" />
+                                    </Button>
+                                )}
+                                {project.github && project.github !== "#" && (
+                                    <Button as="a" href={project.github} target="_blank" rel="noopener noreferrer" variant="outline" className="text-xs uppercase tracking-wider">
+                                        GitHub <Github className="w-4 h-4" />
+                                    </Button>
+                                )}
+                                {project.video && (
+                                    <Button as="a" href={project.video} target="_blank" rel="noopener noreferrer" variant="outline" className="text-xs uppercase tracking-wider text-blue-500 border-blue-500/20 hover:bg-blue-500/10 dark:text-blue-400 dark:border-blue-400/20 dark:hover:bg-blue-400/10">
+                                        Demo Video <Play className="w-4 h-4" />
+                                    </Button>
+                                )}
+                                {project.article && (
+                                    <Button as="a" href={project.article} target="_blank" rel="noopener noreferrer" variant="outline" className="text-xs uppercase tracking-wider text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-400/20 dark:hover:bg-emerald-400/10">
+                                        Article <FileText className="w-4 h-4" />
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -148,179 +748,245 @@ const ProjectModal = ({ project, onClose }) => {
     );
 };
 
-// ─── Resource Card  (GitHub / Notion / PDF) ─────────────────────────────────
-const RESOURCE_STYLES = {
-    GitHub: { border: "border-zinc-700/50", badge: "bg-zinc-800 text-zinc-300", Icon: Github },
-    Notion: { border: "border-violet-900/40", badge: "bg-violet-950/50 text-violet-300", Icon: BookOpen },
-    PDF: { border: "border-rose-900/40", badge: "bg-rose-950/50 text-rose-300", Icon: FileText },
-};
-
-const ResourceCard = ({ item, idx }) => {
-    const s = RESOURCE_STYLES[item.type] ?? RESOURCE_STYLES.PDF;
-    const hasLink = item.link && item.link !== "#";
-    const Tag = hasLink ? "a" : "div";
-    const tagProps = hasLink ? { href: item.link, target: "_blank", rel: "noopener noreferrer" } : {};
+// ─── Premium Segmented Chips Navigation ──────────────────────────────────
+const SegmentedChips = ({ activeId, onChange, isLight }) => {
     return (
-        <FadeIn delay={idx * 0.06}>
-            <Tag {...tagProps}
-                className={`group flex flex-col h-full bg-zinc-900 border ${s.border} rounded-2xl p-5 transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 ${hasLink ? "cursor-pointer" : "cursor-default opacity-75"}`}
-            >
-                <div className="flex items-start justify-between mb-3">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wider uppercase ${s.badge}`}>
-                        <s.Icon className="w-3.5 h-3.5" /> {item.type}
-                    </span>
-                    {hasLink && <ArrowUpRight className="w-4 h-4 text-zinc-600 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />}
-                </div>
-                <h3 className="text-sm font-bold font-heading text-foreground group-hover:text-primary transition-colors mb-2 leading-snug">{item.title}</h3>
-                <p className="text-xs text-zinc-500 leading-relaxed line-clamp-3 flex-grow mb-3">{item.description}</p>
-                <div className="flex flex-wrap gap-1.5 mt-auto">
-                    {item.tags?.map((t, i) => <span key={i} className="text-[9px] px-2 py-0.5 rounded bg-white/5 border border-white/5 text-zinc-500">{t}</span>)}
-                </div>
-                {!hasLink && <p className="text-[9px] text-zinc-600 mt-3 italic">Link coming soon</p>}
-            </Tag>
-        </FadeIn>
+        <div className="flex items-center gap-1 p-1 bg-secondary/90 border border-border/80 rounded-full max-w-full overflow-x-auto scrollbar-none shadow-premium-sm">
+            {CATEGORIES.map((cat) => {
+                const isActive = cat.id === activeId;
+                return (
+                    <button
+                        key={cat.id}
+                        onClick={() => onChange(cat.id)}
+                        className={`relative px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap outline-none
+                            ${isActive 
+                                ? "text-primary-foreground font-black scale-[1.03]" 
+                                : "text-secondary-foreground hover:text-foreground font-semibold"
+                            }`}
+                    >
+                        {isActive && (
+                            <motion.div
+                                layoutId="activeCategoryChip"
+                                className="absolute inset-0 bg-primary rounded-full z-0"
+                                transition={{ type: "spring", stiffness: 380, damping: 26 }}
+                            />
+                        )}
+                        <span className="relative z-10">{cat.label}</span>
+                    </button>
+                );
+            })}
+        </div>
     );
 };
 
-// ─── Project Card ──────────────────────────────────────────────────────────
-const ProjectCard = ({ project, idx, onLearnMore }) => (
-    <FadeIn delay={idx * 0.06}>
-        <div className="group relative bg-card rounded-2xl overflow-hidden border border-white/10 hover:border-primary/40 transition-all duration-500 hover:shadow-xl hover:shadow-primary/10 flex flex-col h-full">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-            {project.image ? (
-                <div className="w-full h-44 border-b border-white/10 relative overflow-hidden shrink-0">
-                    <img src={project.image} alt={project.title} className={`w-full h-full object-cover transition-transform duration-700 ${project.image.includes('coming-soon') ? '' : 'group-hover:scale-105'}`} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-transparent to-transparent" />
-                </div>
-            ) : (
-                <div className="w-full h-32 border-b border-white/5 shrink-0 flex items-center justify-center bg-gradient-to-br from-primary/10 via-zinc-900 to-black relative overflow-hidden">
-                    <span className="text-6xl opacity-[0.07] font-extrabold select-none" style={{ fontFamily: "var(--font-heading)" }}>{project.title.charAt(0)}</span>
-                    {isOngoing(project) && <span className="absolute top-3 right-3 text-[9px] font-bold tracking-widest uppercase text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-1 rounded-full">Coming Soon</span>}
-                </div>
-            )}
-            <div className="relative p-5 flex flex-col flex-grow z-10">
-                <div className="mb-3">
-                    <span className="inline-block px-2 py-0.5 bg-secondary/50 text-secondary-foreground text-[9px] font-bold tracking-wider uppercase rounded border border-white/5 mb-2">{project.category}</span>
-                    <h3 className="text-lg font-bold font-heading group-hover:text-primary transition-colors leading-tight">{project.title}</h3>
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                        {project.tech.slice(0, 4).map((tag, i) => <span key={i} className="px-2 py-0.5 rounded text-[9px] font-medium text-muted-foreground border border-white/5">{tag}</span>)}
-                    </div>
-                </div>
-                <p className="text-sm text-zinc-400 leading-relaxed line-clamp-2 flex-grow mb-4">{project.description || project.highlights?.[0]}</p>
-                <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-3">
-                    <button onClick={() => onLearnMore(project)} className="text-sm font-medium text-zinc-400 hover:text-primary flex items-center gap-1 transition-colors group/btn">
-                        Learn More <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
-                    </button>
-                    <div className="flex gap-1">
-                        {project.link && project.link !== "#" && <a href={project.link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="p-1.5 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-primary transition-colors" title="Live Demo"><ExternalLink className="w-3.5 h-3.5" /></a>}
-                        {project.github && project.github !== "#" && <a href={project.github} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="p-1.5 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-foreground transition-colors" title="GitHub"><Github className="w-3.5 h-3.5" /></a>}
-                        {project.video && <a href={project.video} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="p-1.5 rounded-lg hover:bg-blue-500/10 text-zinc-500 hover:text-blue-400 transition-colors" title="Demo Video"><Play className="w-3.5 h-3.5" /></a>}
-                        {project.article && <a href={project.article} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="p-1.5 rounded-lg hover:bg-emerald-500/10 text-zinc-500 hover:text-emerald-400 transition-colors" title="Article"><FileText className="w-3.5 h-3.5" /></a>}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </FadeIn>
-);
-
-// ─── Main Page ─────────────────────────────────────────────────────────────
+// ─── Main Projects Page Component ──────────────────────────────────────────
 export const ProjectsPage = () => {
     const { projects, resources = [] } = portfolioData;
-    const [activeId, setActiveId] = useState("all");
+    const [activeId, setActiveId] = useState("featured");
     const [selectedProject, setSelected] = useState(null);
+    const [isLight, setIsLight] = useState(false);
+    const isScrollingRef = useRef(false);
+
+    useEffect(() => {
+        setIsLight(document.documentElement.classList.contains("light"));
+        const observer = new MutationObserver(() => {
+            setIsLight(document.documentElement.classList.contains("light"));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => { window.scrollTo(0, 0); }, []);
 
-    const isResources = activeId === "resources";
-    const displayed = useMemo(() => filterProjects(projects, activeId), [activeId, projects]);
+    // Categorized lists
+    const featuredProjects = useMemo(() => projects.filter(p => p.id === 3 || p.id === 4), [projects]);
+    const agenticProjects = useMemo(() => projects.filter(p => AGENTIC_CATS.includes(p.category) && !featuredProjects.some(f => f.id === p.id)), [projects, featuredProjects]);
+    const mldlProjects = useMemo(() => projects.filter(p => MLDL_CATS.includes(p.category) && !featuredProjects.some(f => f.id === p.id)), [projects, featuredProjects]);
+    const sweProjects = useMemo(() => projects.filter(p => SWE_CATS.includes(p.category)), [projects]);
+
+    // Intersection observers connecting scroll targets back to selector active pills
+    useEffect(() => {
+        const observerOptions = {
+            root: null,
+            rootMargin: "-25% 0px -55% 0px",
+            threshold: 0.05
+        };
+
+        const observerCallback = (entries) => {
+            if (isScrollingRef.current) return;
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setActiveId(entry.target.id);
+                }
+            });
+        };
+
+        const observer = new IntersectionObserver(observerCallback, observerOptions);
+        CATEGORIES.forEach((cat) => {
+            const el = document.getElementById(cat.id);
+            if (el) observer.observe(el);
+        });
+
+        return () => observer.disconnect();
+    }, [projects]);
+
+    const handleChipChange = (catId) => {
+        setActiveId(catId);
+        isScrollingRef.current = true;
+        const el = document.getElementById(catId);
+        if (el) {
+            const headerOffset = 150;
+            const elementPosition = el.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth"
+            });
+            
+            setTimeout(() => {
+                isScrollingRef.current = false;
+            }, 850);
+        }
+    };
 
     return (
         <>
-            <div className="flex min-h-screen pt-20 bg-background">
-
-                {/* ── Sticky sidebar ─────────────────────────────── */}
-                <aside className="hidden md:flex flex-col flex-shrink-0 border-r border-white/5 sticky top-20 self-start"
-                    style={{ width: 280, height: "calc(100vh - 80px)" }}>
-                    <div className="px-6 pt-10 pb-4 flex-shrink-0 border-b border-white/5 bg-zinc-950/20">
-                        <Link to="/" className="inline-flex items-center gap-2 text-zinc-500 hover:text-primary transition-colors group text-xs font-bold uppercase tracking-widest">
-                            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-                            Portfolio
-                        </Link>
+            <div className="min-h-screen pt-28 pb-36 bg-background text-foreground transition-colors duration-500">
+                
+                {/* ── Editorial Header Spread ────────────────────────────────── */}
+                <header className="container-responsive max-w-6xl mx-auto px-6 mb-10 text-center md:text-left">
+                    <Link to="/" className="inline-flex items-center gap-2 text-secondary-foreground hover:text-primary transition-all group text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
+                        <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+                        Back to Portfolio
+                    </Link>
+                    <div className="max-w-3xl mt-4">
+                        <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-primary/10 border border-primary/20 text-primary mb-5">
+                            Product Gallery
+                        </span>
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold font-heading tracking-tight text-foreground mb-4 leading-none">
+                            Crafting production AI systems.
+                        </h1>
+                        <p className="text-secondary-foreground text-sm sm:text-base leading-relaxed font-body max-w-2xl">
+                            A curated gallery of platforms, systems, and research engineered to combine planning orchestration, retrieval-augmented intelligence, and enterprise integrations.
+                        </p>
                     </div>
+                </header>
 
-                    <div className="flex-1 px-3 py-6 overflow-y-auto custom-scrollbar">
-                        <div className="px-3 mb-6">
-                            <p className="text-[10px] font-black tracking-[0.25em] uppercase text-zinc-600">Explore Work</p>
+                {/* ── Sticky segmented chip selector pinned under header ── */}
+                <div className="sticky top-20 z-40 w-full flex justify-center py-4 bg-background/80 backdrop-blur-md border-b border-border/30 mb-12 px-6 transition-colors duration-500">
+                    <SegmentedChips 
+                        activeId={activeId} 
+                        onChange={handleChipChange} 
+                        isLight={isLight} 
+                    />
+                </div>
+
+                {/* ── Product Exploration Content continuous sections flow ───── */}
+                <main className="container-responsive max-w-6xl mx-auto px-6 space-y-24 md:space-y-36">
+                    
+                    {/* 1. Featured Section */}
+                    <section id="featured" className="scroll-mt-48 space-y-12 md:space-y-16">
+                        <div className="border-b border-border pb-4 flex justify-between items-end">
+                            <h2 className="font-heading text-lg font-black uppercase tracking-[0.2em] text-foreground">Featured Products</h2>
+                            <span className="text-[10px] font-mono text-secondary-foreground">{featuredProjects.length} systems</span>
                         </div>
-                        <VerticalCategoryNav categories={CATEGORIES} activeId={activeId} onChange={setActiveId} />
-                    </div>
-
-                    <div className="h-40 flex items-center justify-center border-t border-white/5 bg-white/[0.01]">
-                        <p className="text-zinc-500 text-sm">Select a category to filter projects</p>
-                    </div>
-                </aside>
-
-                {/* ── Main content ────────────────────────────────────────────── */}
-                <main className="flex-1 min-w-0 px-8 lg:px-12 xl:px-16 py-10 pb-28 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4 pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-highlight/5 rounded-full blur-3xl translate-y-1/4 pointer-events-none" />
-
-                    {/* mobile pills */}
-                    <div className="flex md:hidden flex-wrap gap-2 mb-8">
-                        <Link to="/" className="w-full inline-flex items-center gap-1.5 text-zinc-500 hover:text-primary text-xs mb-2">
-                            <ArrowLeft className="w-3.5 h-3.5" /> Back
-                        </Link>
-                        {CATEGORIES.map(cat => (
-                            <button key={cat.id} onClick={() => setActiveId(cat.id)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${activeId === cat.id ? "bg-primary text-primary-foreground" : "bg-white/5 text-zinc-400 hover:bg-white/10"}`}>
-                                {cat.label}
-                            </button>
+                        {featuredProjects.map((p, i) => (
+                            <FlagshipSpread 
+                                key={p.id} 
+                                project={p} 
+                                idx={i} 
+                                onLearnMore={setSelected} 
+                                isLight={isLight} 
+                            />
                         ))}
-                    </div>
+                    </section>
 
-                    {/* Animated heading */}
-                    <AnimatePresence mode="wait">
-                        <motion.div key={`h-${activeId}`}
-                            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}
-                            className="mb-10 relative z-10"
-                        >
-                            <h1 className="text-4xl md:text-6xl font-extrabold text-foreground mb-2" style={{ fontFamily: "var(--font-heading)", letterSpacing: "-0.025em" }}>
-                                {CATEGORIES.find(c => c.id === activeId)?.label ?? "All Projects"}
-                            </h1>
-                            <p className="text-zinc-500 text-sm">
-                                {isResources
-                                    ? `${resources.length} resource${resources.length !== 1 ? "s" : ""} — repos, templates & notes`
-                                    : `${displayed.length} project${displayed.length !== 1 ? "s" : ""}`}
-                            </p>
-                        </motion.div>
-                    </AnimatePresence>
+                    {/* 2. AI Systems Section */}
+                    <section id="agentic" className="scroll-mt-48 space-y-12">
+                        <div className="border-b border-border pb-4 flex justify-between items-end">
+                            <h2 className="font-heading text-lg font-black uppercase tracking-[0.2em] text-foreground">AI Systems</h2>
+                            <span className="text-[10px] font-mono text-secondary-foreground">{agenticProjects.length} systems</span>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+                            {agenticProjects.map((p, i) => (
+                                <SupportingCard 
+                                    key={p.id} 
+                                    project={p} 
+                                    idx={i} 
+                                    onLearnMore={setSelected} 
+                                    isLight={isLight} 
+                                />
+                            ))}
+                        </div>
+                    </section>
 
-                    {/* Content grid */}
-                    <AnimatePresence mode="wait">
-                        {isResources ? (
-                            <motion.div key="res"
-                                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }}
-                                className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 relative z-10"
-                            >
-                                {resources.length
-                                    ? resources.map((r, i) => <ResourceCard key={r.id} item={r} idx={i} />)
-                                    : <p className="col-span-3 text-zinc-500 text-sm py-12 text-center">No resources added yet.</p>}
-                            </motion.div>
-                        ) : (
-                            <motion.div key={activeId}
-                                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }}
-                                className="grid md:grid-cols-2 xl:grid-cols-3 gap-6 relative z-10"
-                            >
-                                {displayed.length
-                                    ? displayed.map((p, i) => <ProjectCard key={p.id} project={p} idx={i} onLearnMore={setSelected} />)
-                                    : <p className="col-span-3 text-zinc-500 text-sm py-12 text-center">No projects in this category yet.</p>}
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                    {/* 3. Machine Learning Section */}
+                    <section id="mldl" className="scroll-mt-48 space-y-12">
+                        <div className="border-b border-border pb-4 flex justify-between items-end">
+                            <h2 className="font-heading text-lg font-black uppercase tracking-[0.2em] text-foreground">ML / Data</h2>
+                            <span className="text-[10px] font-mono text-secondary-foreground">{mldlProjects.length} systems</span>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+                            {mldlProjects.map((p, i) => (
+                                <SupportingCard 
+                                    key={p.id} 
+                                    project={p} 
+                                    idx={i} 
+                                    onLearnMore={setSelected} 
+                                    isLight={isLight} 
+                                />
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* 4. Software Engineering Section */}
+                    <section id="software" className="scroll-mt-48 space-y-12">
+                        <div className="border-b border-border pb-4 flex justify-between items-end">
+                            <h2 className="font-heading text-lg font-black uppercase tracking-[0.2em] text-foreground">Web / SW Development</h2>
+                            <span className="text-[10px] font-mono text-secondary-foreground">{sweProjects.length} systems</span>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+                            {sweProjects.map((p, i) => (
+                                <SupportingCard 
+                                    key={p.id} 
+                                    project={p} 
+                                    idx={i} 
+                                    onLearnMore={setSelected} 
+                                    isLight={isLight} 
+                                />
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* 5. Research & Learning Section */}
+                    <section id="research" className="scroll-mt-48 space-y-12">
+                        <div className="border-b border-border pb-4 flex justify-between items-end">
+                            <h2 className="font-heading text-lg font-black uppercase tracking-[0.2em] text-foreground">Research & Learning</h2>
+                            <span className="text-[10px] font-mono text-secondary-foreground">{resources.length} items</span>
+                        </div>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {resources.map((r, i) => (
+                                <ResourceCard 
+                                    key={r.id} 
+                                    item={r} 
+                                    idx={i} 
+                                />
+                            ))}
+                        </div>
+                    </section>
+
                 </main>
+
             </div>
 
-            {selectedProject && <ProjectModal project={selectedProject} onClose={() => setSelected(null)} />}
+            {selectedProject && (
+                <ProjectModal 
+                    project={selectedProject} 
+                    onClose={() => setSelected(null)} 
+                    isLight={isLight} 
+                />
+            )}
         </>
     );
 };

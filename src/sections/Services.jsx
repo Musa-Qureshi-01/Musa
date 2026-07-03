@@ -27,16 +27,25 @@ const services = [
 
 export const Services = () => {
     return (
-        <section id="services" className="section-padding relative overflow-hidden bg-background">
+        <section id="services" className="section-padding relative overflow-hidden bg-background-alt border-t border-border/20">
             <div className="container-responsive relative z-10 mx-auto">
                 <div className="relative">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-                    <div className="text-center mb-8 pt-4">
+                    <div className="text-center mx-auto max-w-3xl mb-16">
                         <ScrollReveal>
-                            <h3 className="text-lg md:text-xl font-bold text-foreground font-heading">What I Do</h3>
+                            <span className="text-secondary-foreground text-sm font-medium tracking-wider uppercase font-mono">
+                                Services & Solutions
+                            </span>
                         </ScrollReveal>
-                        <ScrollReveal delay={0.1}>
-                            <p className="text-[11px] md:text-xs text-muted-foreground mt-1">Specialized services across the AI and Full-Stack spectrum.</p>
+                        <div className="mt-3 mb-4">
+                            <LetterReveal 
+                                text="What I Do." 
+                                className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground font-heading" 
+                            />
+                        </div>
+                        <ScrollReveal delay={0.2}>
+                            <p className="text-secondary-foreground text-sm sm:text-base leading-relaxed">
+                                Specialized services across the AI and Full-Stack spectrum.
+                            </p>
                         </ScrollReveal>
                     </div>
 
@@ -45,14 +54,12 @@ export const Services = () => {
                             const Icon = item.icon;
                             return (
                                 <Reveal key={idx} delay={0.2 + (idx * 0.1)}>
-                                    <div className="bg-white/[0.02] p-6 md:p-8 rounded-3xl border border-white/10 hover:border-primary/30 hover:bg-white/[0.04] hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 group h-full flex flex-col relative overflow-hidden">
-                                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-10 group-hover:bg-primary/10 transition-colors duration-500" />
-
-                                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 text-primary group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 border border-primary/20 shadow-lg shadow-primary/5">
-                                            <Icon className="w-5 h-5" />
+                                    <div className="bg-card p-6 md:p-8 rounded-2xl border border-border shadow-premium hover:shadow-premium-hover hover:border-border-hover transition-all duration-300 group h-full flex flex-col relative overflow-hidden">
+                                        <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center mb-5 text-secondary-foreground group-hover:text-foreground transition-colors border border-border">
+                                            <Icon className="w-4 h-4" />
                                         </div>
-                                        <h4 className="text-lg font-bold mb-2 text-foreground font-heading group-hover:text-primary transition-colors">{item.title}</h4>
-                                        <p className="text-sm text-zinc-400 leading-relaxed font-body flex-grow">
+                                        <h4 className="text-base font-bold mb-2 text-foreground font-heading">{item.title}</h4>
+                                        <p className="text-xs text-secondary-foreground leading-relaxed font-body flex-grow">
                                             {item.description}
                                         </p>
                                     </div>
