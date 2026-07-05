@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { X, Download, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const RESUME_PATH = "/assets/Musa_Qureshi_Resume.pdf";
+const RESUME_PATH = "/assets/Musa. Resume.pdf";
 
 export const ResumeModal = ({ isOpen, onClose }) => {
   // Lock body scroll + close on Esc + close on scroll

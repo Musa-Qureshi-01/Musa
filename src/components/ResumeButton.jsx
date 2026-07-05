@@ -1,6 +1,6 @@
 import { Eye, Download } from "lucide-react";
 
-const RESUME_PATH = "/assets/Musa_Qureshi_Resume.pdf";
+const RESUME_PATH = "/assets/Musa. Resume.pdf";
 
 /**
  * Split Resume Button

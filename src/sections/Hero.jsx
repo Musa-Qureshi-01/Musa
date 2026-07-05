@@ -154,7 +154,7 @@ export const Hero = ({ onOpenResume }) => {
               
               <Button
                 as="a"
-                href="/assets/Musa_Qureshi_Resume.pdf"
+                href="/assets/Musa. Resume.pdf"
                 download="Musa_Qureshi_Resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
