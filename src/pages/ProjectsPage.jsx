@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { portfolioData } from "@/data/portfolio";
 import { FadeIn } from "@/components/Reveal";
 import { Button } from "@/components/Button";
+import { ProjectMediaFrame } from "@/components/ProjectMediaFrame";
 
 // ─── Category Definitions ──────────────────────────────────────────────────
 const CATEGORIES = [
@@ -25,7 +26,8 @@ const AGENTIC_CATS = [
     "AI Security & Governance", 
     "AI-Native Collaborative Documentation Platform", 
     "AI Tooling & Orchestration",
-    "AI-Powered Public Governance"
+    "AI-Powered Public Governance",
+    "Industrial AI & Enterprise Intelligence"
 ];
 
 const MLDL_CATS = [
@@ -345,10 +347,10 @@ const FlagshipSpread = ({ project, idx, onLearnMore, isLight }) => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <img 
-                                        src={projectImage} 
-                                        alt={project.title} 
-                                        className="w-full h-full object-contain bg-transparent transition-transform duration-700 group-hover/mockup:scale-[1.02]" 
+                                    <ProjectMediaFrame 
+                                        project={project} 
+                                        projectImage={projectImage} 
+                                        isLight={isLight} 
                                     />
                                 )}
                             </div>
@@ -566,11 +568,24 @@ const SupportingCard = ({ project, idx, onLearnMore, isLight }) => {
                             <div className={`relative w-full h-full overflow-hidden rounded-[10px] border transition-all duration-500
                                 ${isLight ? "bg-black border-zinc-800" : "bg-white border-zinc-300"}`}
                             >
-                                <img 
-                                    src={projectImage} 
-                                    alt={project.title} 
-                                    className="w-full h-full object-contain bg-transparent transition-transform duration-700 group-hover:scale-[1.03]" 
-                                />
+                                {project.isComingSoon ? (
+                                    <div className="relative w-full h-full bg-zinc-950 flex flex-col items-center justify-center overflow-hidden select-none">
+                                        <div 
+                                            className="absolute inset-0 bg-cover bg-center opacity-90"
+                                            style={{ backgroundImage: `url('${projectImage}')` }}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-black/30 pointer-events-none" />
+                                        <div className="absolute bottom-2 right-2 w-[45%] h-[38%] max-w-[120px] max-h-[70px] bg-[#0c0d0e]/95 rounded-lg border border-white/10 shadow-2xl opacity-90 transition-all duration-300 overflow-hidden z-20">
+                                            <LaunchCountdown isLight={isLight} isMini={true} />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <img 
+                                        src={projectImage} 
+                                        alt={project.title} 
+                                        className="w-full h-full object-contain bg-transparent transition-transform duration-700 group-hover:scale-[1.03]" 
+                                    />
+                                )}
                             </div>
                         </div>
                     </div>
@@ -695,7 +710,22 @@ const ProjectModal = ({ project, onClose, isLight }) => {
                         <div className="p-6 sm:p-8 lg:p-10">
                             <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">{project.category}</p>
                             <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-foreground mb-4">{project.title}</h2>
-                            <p className="text-secondary-foreground leading-relaxed text-sm sm:text-base mb-8">{project.description}</p>
+                            <p className="text-secondary-foreground leading-relaxed text-sm sm:text-base mb-6">{project.description}</p>
+                            
+                            {project.problem && (
+                                <div className="mb-6 pl-4 border-l-2 border-red-500/40">
+                                    <p className="text-foreground text-sm font-semibold mb-2 font-mono uppercase tracking-wider text-[11px] text-zinc-400">The Problem</p>
+                                    <p className="text-secondary-foreground text-sm leading-relaxed font-body">{project.problem}</p>
+                                </div>
+                            )}
+                            
+                            {project.solution && (
+                                <div className="mb-8 pl-4 border-l-2 border-emerald-500/40">
+                                    <p className="text-foreground text-sm font-semibold mb-2 font-mono uppercase tracking-wider text-[11px] text-zinc-400">The Solution</p>
+                                    <p className="text-secondary-foreground text-sm leading-relaxed font-body">{project.solution}</p>
+                                </div>
+                            )}
+
                             {project.highlights?.length > 0 && (
                                 <div className="mb-8 pl-4 border-l-2 border-primary/40">
                                     <p className="text-foreground text-sm font-semibold mb-3">Key Highlights</p>
@@ -706,6 +736,30 @@ const ProjectModal = ({ project, onClose, isLight }) => {
                                             </li>
                                         ))}
                                     </ul>
+                                </div>
+                            )}
+
+                            {project.services && (
+                                <div className="mb-8">
+                                    <p className="text-foreground text-sm font-semibold mb-3">Core Services</p>
+                                    <div className="border border-border rounded-2xl overflow-hidden bg-secondary/15">
+                                        <table className="w-full text-left border-collapse text-xs font-body">
+                                            <thead>
+                                                <tr className="border-b border-border bg-secondary/40 font-mono text-[9px] uppercase tracking-wider text-secondary-foreground">
+                                                    <th className="p-3 font-bold">Service</th>
+                                                    <th className="p-3 font-bold">Description</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {project.services.map((srv, idx) => (
+                                                    <tr key={idx} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+                                                        <td className="p-3 font-semibold text-foreground whitespace-nowrap">{srv.name}</td>
+                                                        <td className="p-3 text-secondary-foreground">{srv.desc}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             )}
                             <div className="mb-8">
@@ -799,7 +853,7 @@ export const ProjectsPage = () => {
     useEffect(() => { window.scrollTo(0, 0); }, []);
 
     // Categorized lists
-    const featuredProjects = useMemo(() => projects.filter(p => p.id === 3 || p.id === 4), [projects]);
+    const featuredProjects = useMemo(() => projects.filter(p => p.title === "GovernanceAI" || p.title === "ATHLEIA.AI"), [projects]);
     const agenticProjects = useMemo(() => projects.filter(p => AGENTIC_CATS.includes(p.category) && !featuredProjects.some(f => f.id === p.id)), [projects, featuredProjects]);
     const mldlProjects = useMemo(() => projects.filter(p => MLDL_CATS.includes(p.category) && !featuredProjects.some(f => f.id === p.id)), [projects, featuredProjects]);
     const sweProjects = useMemo(() => projects.filter(p => SWE_CATS.includes(p.category)), [projects]);

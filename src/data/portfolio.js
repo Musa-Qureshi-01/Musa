@@ -134,7 +134,7 @@ export const portfolioData = {
                 website: "https://governancexai.vercel.app/",
                 caseStudies: "https://governancexai.vercel.app/",
                 blog: "https://medium.com/@musa-qureshi",
-                video: "https://x.com/Musa_Qureshi_01/status/2025545446374928552?s=20"
+                video: "https://www.loom.com/embed/5580124094e64703868def942bbb1d18"
             }
         },
 
@@ -142,7 +142,7 @@ export const portfolioData = {
             id: 4,
             title: "EDITORIAL.IO",
             category: "AI-Native Collaborative Documentation Platform",
-            image: "/assets/Editorial_Banner.png",
+            image: "/assets/launch-soon-bg.png",
             isComingSoon: true,
             description: "AI-native collaborative documentation platform. Enables organizations to create, manage, and maintain business and technical documentation through specialized multi-agent AI systems for PRDs, SOPs, technical documentation, compliance documents, reports, and organizational knowledge.",
             tech: ["Next.js", "Clerk", "FastAPI", "Redis", "LangGraph"],
@@ -162,6 +162,43 @@ export const portfolioData = {
             }
         },
         {
+            id: 15,
+            title: "ATHLEIA.AI",
+            category: "Industrial AI & Enterprise Intelligence",
+            image: "/assets/Athleia_dark.png",
+            imageLight: "/assets/Athleia_light.png",
+            imageDark: "/assets/Athleia_dark.png",
+            description: "Athleia.ai is an Enterprise Industrial Knowledge Intelligence Platform that transforms fragmented engineering documents, SOPs, maintenance records, and compliance data into trusted, searchable, and actionable enterprise intelligence.",
+            problem: "Industrial knowledge is fragmented across disconnected systems, making critical information difficult to discover, validate, and reuse. This results in operational delays, compliance risks, unplanned downtime, and the gradual loss of institutional expertise.",
+            solution: "Athleia.ai unifies enterprise knowledge into a single intelligence layer using AI, Knowledge Graphs, Open Knowledge Format (OKF), and Grounded RAG, enabling organizations to search, reason, and make confident decisions from trusted data.",
+            tech: ["React", "Next.js", "FastAPI", "Claude 3.5", "Gemini", "Python", "Groq", "AWS"],
+            link: "https://main.d3eih13i37l72p.amplifyapp.com/",
+            github: "https://github.com/Musa-Qureshi-01/Athleia",
+            highlights: [
+                "Engineered an industrial AI platform that unifies complex engineering P&ID drawings, CAD schematics, and maintenance SOPs into zero-fabrication reasoning.",
+                "Built a hybrid search & retrieval pipeline combining BM25 tag matching with dense vector reciprocal rank fusion (RRF) for sub-250ms query responses with 99.94% precision.",
+                "Designed a multi-agent workforce copilot supporting Groq, Claude 3.5, and Gemini with stateful multi-model task routing and step-level citation provenance."
+            ],
+            services: [
+                { name: "Document Intelligence", desc: "Ingests and structures engineering documents, SOPs, manuals, and maintenance records." },
+                { name: "Industrial Search", desc: "Semantic enterprise search across all organizational knowledge." },
+                { name: "Knowledge Intelligence", desc: "Extracts entities, relationships, and operational context from enterprise data." },
+                { name: "Knowledge Graph", desc: "Connects assets, documents, processes, and regulations using GraphDB & OKF." },
+                { name: "AI Workforce Copilot", desc: "Grounded conversational assistant for engineers, operators, and technicians." },
+                { name: "Reasoning Engine", desc: "Citation-backed AI reasoning with explainable enterprise answers." },
+                { name: "Compliance Intelligence", desc: "Detects compliance gaps and supports continuous audit readiness." },
+                { name: "Maintenance Intelligence", desc: "Enables predictive maintenance and root cause analysis from historical knowledge." },
+                { name: "Enterprise Security", desc: "JWT, RBAC, audit logging, and secure enterprise access governance." }
+            ],
+            resources: {
+                website: "https://main.d3eih13i37l72p.amplifyapp.com/",
+                caseStudies: "https://main.d3eih13i37l72p.amplifyapp.com/",
+                blog: "https://medium.com/@musa-qureshi",
+                video: "https://www.loom.com/embed/de01322c54414b258f5ba9fececebea8",
+                github: "https://github.com/Musa-Qureshi-01/Athleia"
+            }
+        },
+        {
             id: 13,
             title: "Care Grid",
             category: "Healthcare AI",
@@ -176,6 +213,21 @@ export const portfolioData = {
                 "Engineered an agent-driven AI system to automate provider data validation, reducing manual QA effort by ~60%.",
                 "Improved data accuracy and audit readiness using agent-driven workflows with confidence scoring.",
                 "Established batch-processing pipelines and an analytics dashboard for faster provider review and escalation.",
+            ],
+        },
+        {
+            id: 14,
+            title: "GRIEVANCE.AI",
+            category: "AI-Powered Public Governance",
+            description: "AI-native civic platform that automates grievance classification, intelligent routing, and case management for citizens and municipal authorities.",
+            tech: ["FastAPI", "React", "Neon PostgreSQL", "Google Cloud Run", "Firebase"],
+            link: "https://grievance-ai-ui.web.app/",
+            github: "#",
+            image: "/assets/GrievanceAI -- Banner.png",
+            highlights: [
+                "Engineered a full-stack governance platform using FastAPI, React, Neon PostgreSQL, Google Cloud Run, and Firebase, enabling secure complaint submission, AI-powered classification, and automated department routing.",
+                "Built an AI-assisted dispatch engine with real-time synchronization, JWT/OIDC authentication, role-based portals, operational dashboards, and distributed ML inference to streamline grievance resolution.",
+                "Designed scalable citizen, officer, and admin workspaces featuring analytics, workflow automation, live case tracking, and AI-driven decision support for efficient public service delivery."
             ],
         },
         {
@@ -221,21 +273,6 @@ export const portfolioData = {
                 "Implemented Bahdanau attention mechanism to improve translation quality over vanilla Seq2Seq.",
                 "Trained on bilingual corpus with padded batching and teacher forcing.",
                 "Achieved measurable BLEU score improvement over baseline RNN model.",
-            ],
-        },
-        {
-            id: 14,
-            title: "GRIEVANCE.AI",
-            category: "AI-Powered Public Governance",
-            description: "AI-native civic platform that automates grievance classification, intelligent routing, and case management for citizens and municipal authorities.",
-            tech: ["FastAPI", "React", "Neon PostgreSQL", "Google Cloud Run", "Firebase"],
-            link: "https://grievance-ai-ui.web.app/",
-            github: "#",
-            image: "/assets/GrievanceAI -- Banner.png",
-            highlights: [
-                "Engineered a full-stack governance platform using FastAPI, React, Neon PostgreSQL, Google Cloud Run, and Firebase, enabling secure complaint submission, AI-powered classification, and automated department routing.",
-                "Built an AI-assisted dispatch engine with real-time synchronization, JWT/OIDC authentication, role-based portals, operational dashboards, and distributed ML inference to streamline grievance resolution.",
-                "Designed scalable citizen, officer, and admin workspaces featuring analytics, workflow automation, live case tracking, and AI-driven decision support for efficient public service delivery."
             ],
         },
         {
@@ -651,42 +688,7 @@ export const portfolioData = {
             tags: ["Journal", "Practice", "Algorithms", "Software Engineering"],
             category: "Repositories",
         },
-        {
-            id: "r5",
-            type: "Paper",
-            title: "Attention Is All You Need",
-            description: "The foundational transformer paper by Vaswani et al. that reshaped the entire landscape of deep learning. Essential reading for anyone working in AI.",
-            link: "https://arxiv.org/abs/1706.03762",
-            tags: ["Transformers", "NLP", "Deep Learning", "Attention"],
-            category: "Research Papers",
-        },
-        {
-            id: "r6",
-            type: "Paper",
-            title: "ReAct: Synergizing Reasoning and Acting in Language Models",
-            description: "Introduces the ReAct prompting paradigm enabling LLMs to interleave chain-of-thought reasoning with external tool use — foundational to modern agentic AI systems.",
-            link: "https://arxiv.org/abs/2210.03629",
-            tags: ["Agents", "ReAct", "Tool Use", "Reasoning"],
-            category: "Research Papers",
-        },
-        {
-            id: "r7",
-            type: "Tool",
-            title: "LangGraph",
-            description: "A library by LangChain for building stateful, multi-actor applications with LLMs using graph-based workflows. Powers the agent orchestration in most of my projects.",
-            link: "https://langchain-ai.github.io/langgraph/",
-            tags: ["LangGraph", "Agentic AI", "Orchestration"],
-            category: "Developer Tools",
-        },
-        {
-            id: "r8",
-            type: "Tool",
-            title: "OpenTelemetry",
-            description: "An open-source observability framework providing APIs, SDKs, and tooling for collecting distributed traces, metrics, and logs — used for agent observability in GovernanceAI.",
-            link: "https://opentelemetry.io/",
-            tags: ["Observability", "Telemetry", "Distributed Systems"],
-            category: "Developer Tools",
-        },
+
     ],
 };
 

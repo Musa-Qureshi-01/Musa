@@ -16,6 +16,7 @@ import { Reveal, FadeIn } from "@/components/Reveal";
 import { Button } from "@/components/Button";
 import { LetterReveal, ScrollReveal } from "@/components/TextAnimations";
 import { motion, AnimatePresence } from "framer-motion";
+import { ProjectMediaFrame } from "@/components/ProjectMediaFrame";
 
 const LaunchCountdown = ({ isLight, isMini = false }) => {
   const [timeLeft, setTimeLeft] = useState({ days: 12, hours: 8, minutes: 45, seconds: 12 });
@@ -133,9 +134,9 @@ export const Projects = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Extract GovernanceAI (ID 3) and EDITORIAL.IO (ID 4) as featured projects
+  // Extract GovernanceAI (ID 3) and ATHLEIA.AI (ID 15) as featured projects
   const featuredProjects = portfolioData.projects.filter(
-    (p) => p.title === "GovernanceAI" || p.title === "EDITORIAL.IO"
+    (p) => p.title === "GovernanceAI" || p.title === "ATHLEIA.AI"
   );
 
   return (
@@ -219,16 +220,12 @@ export const Projects = () => {
                                 <LaunchCountdown isLight={isLight} isMini={true} />
                               </div>
                             </div>
-                          ) : projectImage ? (
-                            <motion.img
-                              src={projectImage}
-                              alt={project.title}
-                              className="w-full h-full object-contain bg-transparent transition-transform duration-1000 ease-[0.16,1,0.3,1] group-hover:scale-[1.03]"
-                            />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-transparent">
-                              <span className="text-secondary-foreground font-mono text-xs uppercase tracking-widest">No Preview</span>
-                            </div>
+                            <ProjectMediaFrame 
+                              project={project} 
+                              projectImage={projectImage} 
+                              isLight={isLight} 
+                            />
                           )}
                         </div>
                       </div>
