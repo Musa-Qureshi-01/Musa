@@ -16,7 +16,7 @@ export const portfolioData = {
             medium: "https://medium.com/@musa-qureshi",
             instagram: "https://www.instagram.com/musaq.06?igsh=d3A0Zzh0dTc3aTRo",
         },
-        bio: "I'm Musa Qureshi, an AI Engineer who enjoys building products that solve real-world problems. I like taking ideas from a blank page to production by combining AI, software engineering, and thoughtful system design to build software that's practical, reliable, and built to last.\n\nOver the past few years, I've worked on AI products across healthcare, developer tools, documentation, computer vision, and enterprise software. Currently, I'm building Editorial.io, developing GovernanceAI, and researching Agentic Case Intelligence to explore more trustworthy and collaborative AI systems.\n\nWhen I'm not building, you'll usually find me writing about engineering, experimenting with emerging technologies, contributing to open source, or exploring ideas around AI, startups, and product development. I'm always looking for opportunities to learn, collaborate, and build technology that creates meaningful impact.",
+        bio: "I'm Musa Qureshi, an AI Engineer who enjoys building products that solve real-world problems. I like taking ideas from a blank page to production by combining AI, software engineering, and thoughtful system design to build software that's practical, reliable, and built to last.\n\nOver the past few years, I've worked on AI products across healthcare, developer tools, documentation, computer vision, and enterprise software. Currently, I'm building Editorial.io, developing GovernanceAI, and architecting Axios AI to explore more trustworthy and collaborative AI systems.\n\nWhen I'm not building, you'll usually find me writing about engineering, experimenting with emerging technologies, contributing to open source, or exploring ideas around AI, startups, and product development. I'm always looking for opportunities to learn, collaborate, and build technology that creates meaningful impact.",
         tagline: "Building intelligent agents and production-grade AI systems.",
         flipWords: ["AI Engineer", "Top 1% Engineer", "Data Scientist"],
     },
@@ -43,14 +43,14 @@ export const portfolioData = {
     experience: [
         {
             id: 1,
-            role: "AI Consultant",
-            company: "Self-Employed · Remote",
-            period: "2024 - Present",
-            description: "Designing and shipping production-grade AI systems with a focus on generative and agentic architectures, delivered end-to-end as real products.",
+            role: "AI Support Engineer",
+            company: "Outlier & Micro1 · Remote",
+            period: "Dec 2025 – Present",
+            description: "Evaluating software systems, LLMs, and model outputs for correctness, reliability, and quality against defined test criteria, contributing structured QA feedback used to improve production model behavior.",
             achievements: [
-                "Building RAG pipelines, agentic workflows, and LLM-powered tools",
-                "Developing autonomous and semi-autonomous agent systems",
-                "Delivering full-stack AI SaaS products from architecture to deployment",
+                "Evaluate softwares, LLMs, and model outputs for correctness, reliability, and quality against defined test criteria.",
+                "Deliver structured QA feedback used to directly improve and calibrate production model behavior.",
+                "Architect and validate agentic workflows, RAG systems, and full-stack software solutions.",
             ],
         },
         {
@@ -163,21 +163,22 @@ export const portfolioData = {
         },
         {
             id: 15,
-            title: "ATHLEIA.AI",
+            title: "Axios AI (formerly Athleai)",
+            award: "🏆 Winner, OregonHacks — international hackathon | ET AI Hackathon | BuildX'26 IIT Kharagpur Grand Finalist",
             category: "Industrial AI & Enterprise Intelligence",
             image: "/assets/Athleia_dark.png",
             imageLight: "/assets/Athleia_light.png",
             imageDark: "/assets/Athleia_dark.png",
-            description: "Athleia.ai is an Enterprise Industrial Knowledge Intelligence Platform that transforms fragmented engineering documents, SOPs, maintenance records, and compliance data into trusted, searchable, and actionable enterprise intelligence.",
+            description: "Enterprise Industrial Knowledge Intelligence Platform that transforms fragmented engineering documents, SOPs, maintenance records, and compliance data into trusted, searchable, and actionable enterprise intelligence.",
             problem: "Industrial knowledge is fragmented across disconnected systems, making critical information difficult to discover, validate, and reuse. This results in operational delays, compliance risks, unplanned downtime, and the gradual loss of institutional expertise.",
-            solution: "Athleia.ai unifies enterprise knowledge into a single intelligence layer using AI, Knowledge Graphs, Open Knowledge Format (OKF), and Grounded RAG, enabling organizations to search, reason, and make confident decisions from trusted data.",
-            tech: ["React", "Next.js", "FastAPI", "Claude 3.5", "Gemini", "Python", "Groq", "AWS"],
+            solution: "Axios AI unifies enterprise knowledge into a single intelligence layer using AI, Knowledge Graphs, Open Knowledge Format (OKF), and Grounded RAG, enabling organizations to search, reason, and make confident decisions from trusted data.",
+            tech: ["Python", "FastAPI", "LangGraph", "Next.js", "PostgreSQL", "Neo4j", "pgvector", "Docker", "AWS"],
             link: "https://main.d3eih13i37l72p.amplifyapp.com/",
             github: "https://github.com/Musa-Qureshi-01/Athleia",
             highlights: [
-                "Engineered an industrial AI platform that unifies complex engineering P&ID drawings, CAD schematics, and maintenance SOPs into zero-fabrication reasoning.",
-                "Built a hybrid search & retrieval pipeline combining BM25 tag matching with dense vector reciprocal rank fusion (RRF) for sub-250ms query responses with 99.94% precision.",
-                "Designed a multi-agent workforce copilot supporting Groq, Claude 3.5, and Gemini with stateful multi-model task routing and step-level citation provenance."
+                "Architected a multi-service enterprise knowledge platform end-to-end — designing the backend API layer, graph database schema (Neo4j), and vector search layer (pgvector) to unify fragmented enterprise documents into one searchable system.",
+                "Built an agentic AI system using Grounded RAG, knowledge graphs, and multi-agent workflows to deliver explainable, citation-backed enterprise intelligence and decision support; containerized and deployed the full stack with Docker on AWS.",
+                "Built a hybrid search & retrieval pipeline combining BM25 tag matching with dense vector reciprocal rank fusion (RRF) for sub-250ms query responses with 99.94% precision."
             ],
             services: [
                 { name: "Document Intelligence", desc: "Ingests and structures engineering documents, SOPs, manuals, and maintenance records." },
@@ -358,14 +359,24 @@ export const portfolioData = {
     ],
     certifications: [
         {
-            name: "Machine Learning Specialization",
-            issuer: "DeepLearning.AI \u00B7 Stanford University",
-            period: "Jan '26 \u2014 May '26",
+            name: "Winner — OregonHacks",
+            issuer: "International Hackathon · BuildX'26 IIT Kharagpur Grand Finalist",
+            period: "2026",
         },
         {
-            name: "OCI Generative AI Professional",
+            name: "Machine Learning Specialization",
+            issuer: "DeepLearning.AI · Stanford University",
+            period: "2026",
+        },
+        {
+            name: "OCI Generative AI Professional (92%)",
             issuer: "Oracle Cloud Infrastructure",
-            period: "Sep 2025",
+            period: "2025",
+        },
+        {
+            name: "Microsoft Certified: SQL & AI",
+            issuer: "Microsoft",
+            period: "2026",
         },
     ],
     editorial: {

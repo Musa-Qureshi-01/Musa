@@ -154,7 +154,7 @@ export const Hero = ({ onOpenResume }) => {
               
               <Button
                 as="a"
-                href="/assets/Musa. Resume.pdf"
+                href="/assets/Musa_Qureshi_Resume.pdf"
                 download="Musa_Qureshi_Resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -256,7 +256,7 @@ export const Hero = ({ onOpenResume }) => {
                 </div>
                 <div className="px-2.5 py-0.5 rounded-full bg-secondary border border-border flex items-center gap-1.5 backdrop-blur-md">
                   <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[9px] font-mono tracking-wider text-muted-foreground font-semibold uppercase">Governance.ai</span>
+                  <span className="text-[9px] font-mono tracking-wider text-muted-foreground font-semibold uppercase">Axios.ai</span>
                 </div>
               </div>
 
@@ -277,7 +277,7 @@ export const Hero = ({ onOpenResume }) => {
                 {/* Sub cards */}
                 <div className="absolute top-[8%] left-[2%] z-20">
                   <div className="bg-background/95 backdrop-blur-md border border-border rounded-xl p-2.5 w-28 shadow-premium hover:border-foreground/20 transition-colors duration-200">
-                    <p className="text-[8px] font-mono text-zinc-500 uppercase tracking-wider mb-0.5">Research Agent</p>
+                    <p className="text-[8px] font-mono text-zinc-500 uppercase tracking-wider mb-0.5">Knowledge Agent</p>
                     <div className="flex items-center gap-1.5">
                       <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping" />
                       <span className="text-[9px] font-medium text-foreground font-mono leading-none">Syncing...</span>

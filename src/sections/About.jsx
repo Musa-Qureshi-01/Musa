@@ -9,7 +9,7 @@ const HIGHLIGHTS = [
   "AI Engineer",
   "Editorial.io",
   "GovernanceAI",
-  "Agentic Case Intelligence",
+  "Axios AI",
   "thoughtful system design",
 ];
 

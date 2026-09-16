@@ -132,8 +132,8 @@ const ExperienceCard = ({ exp, isLight }) => {
             Applied Tech
           </span>
           <div className="flex flex-wrap gap-1.5">
-            {(exp.role === "AI Consultant" 
-              ? ["LangGraph", "Generative AI", "RAG Systems", "Python"] 
+            {(exp.role === "AI Support Engineer" || exp.role === "AI Consultant"
+              ? ["LLM Evaluation", "Model QA", "LangGraph", "Python", "RAG Systems"] 
               : exp.role === "Freelance Software Engineer"
               ? ["React", "Next.js", "FastAPI", "PostgreSQL"] 
               : ["PyTorch", "FinBERT NLP", "Time-Series forecasting", "Python"]
