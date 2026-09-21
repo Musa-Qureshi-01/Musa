@@ -30,6 +30,29 @@ export const ProjectMediaFrame = ({ project, projectImage, isLight }) => {
     ? `${getEmbedUrl(project.resources.video)}?autoplay=1&muted=1&hide_share=true&hideEmbedTopBar=true&hide_title=true&hide_owner=true`
     : null;
 
+  const [imgSrc, setImgSrc] = useState(projectImage);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setImgSrc(projectImage);
+    setHasError(false);
+  }, [projectImage]);
+
+  const handleImageError = () => {
+    // Attempt graceful fallbacks before showing placeholder
+    if (imgSrc !== project.image && project.image) {
+      setImgSrc(project.image);
+    } else if (imgSrc !== project.imageDark && project.imageDark) {
+      setImgSrc(project.imageDark);
+    } else if (imgSrc !== project.imageLight && project.imageLight) {
+      setImgSrc(project.imageLight);
+    } else if (project?.title?.includes("Axios") && imgSrc !== "/assets/Athleia_Banner.png") {
+      setImgSrc("/assets/Athleia_Banner.png");
+    } else {
+      setHasError(true);
+    }
+  };
+
   return (
     <div
       ref={containerRef}
@@ -43,16 +66,24 @@ export const ProjectMediaFrame = ({ project, projectImage, isLight }) => {
       }}
     >
       {/* 1. Static Image View */}
-      <motion.img
-        src={projectImage}
-        alt={project.title}
-        className="w-full h-full object-cover bg-transparent select-none pointer-events-none"
-        animate={{ 
-          scale: isHovered ? 1.04 : 1,
-          opacity: (isHovered && iframeLoaded) ? 0 : 1
-        }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      />
+      {!hasError ? (
+        <motion.img
+          src={imgSrc}
+          alt={project.title}
+          onError={handleImageError}
+          className="w-full h-full object-cover bg-transparent select-none pointer-events-none"
+          animate={{ 
+            scale: isHovered ? 1.04 : 1,
+            opacity: (isHovered && iframeLoaded) ? 0 : 1
+          }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        />
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950 p-6 text-center">
+          <div className="text-sm font-bold text-foreground mb-1">{project.title}</div>
+          <div className="text-xs text-secondary-foreground font-mono">{project.category}</div>
+        </div>
+      )}
 
       {/* Hover Prompt/Hint Overlay */}
       {hasLoomVideo && !isHovered && (

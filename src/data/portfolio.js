@@ -164,7 +164,6 @@ export const portfolioData = {
         {
             id: 15,
             title: "Axios AI (formerly Athleai)",
-            award: "🏆 Winner, OregonHacks — international hackathon | ET AI Hackathon | BuildX'26 IIT Kharagpur Grand Finalist",
             category: "Industrial AI & Enterprise Intelligence",
             image: "/assets/Athleia_dark.png",
             imageLight: "/assets/Athleia_light.png",

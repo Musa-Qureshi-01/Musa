@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import {
     ArrowUpRight, Github, Play, FileText, ExternalLink,
     ArrowLeft, X, ChevronRight, BookOpen, Sparkles, ArrowRight,
-    Star, GitFork, Code2, Trophy,
+    Star, GitFork, Code2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -364,12 +364,6 @@ const FlagshipSpread = ({ project, idx, onLearnMore, isLight }) => {
                         <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" />
                         Flagship Platform
                     </span>
-                    {project.award && (
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-300 text-xs font-medium mb-3.5 backdrop-blur-sm shadow-sm max-w-full">
-                            <Trophy className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 shrink-0" />
-                            <span className="leading-snug">{project.award}</span>
-                        </div>
-                    )}
                     <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground font-heading tracking-tight mb-4">
                         {project.title}
                     </h2>
@@ -715,12 +709,6 @@ const ProjectModal = ({ project, onClose, isLight }) => {
                         )}
                         <div className="p-6 sm:p-8 lg:p-10">
                             <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">{project.category}</p>
-                            {project.award && (
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-300 text-xs font-medium mb-3.5 backdrop-blur-sm shadow-sm max-w-full">
-                                    <Trophy className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 shrink-0" />
-                                    <span className="leading-snug">{project.award}</span>
-                                </div>
-                            )}
                             <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-foreground mb-4">{project.title}</h2>
                             <p className="text-secondary-foreground leading-relaxed text-sm sm:text-base mb-6">{project.description}</p>
                             

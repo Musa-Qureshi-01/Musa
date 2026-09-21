@@ -8,7 +8,6 @@ import {
   FileText,
   BookOpen,
   Play,
-  Trophy,
   X 
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -249,14 +248,6 @@ export const Projects = () => {
                         </span>
                       </div>
 
-                      {/* Award / Accolade Badge */}
-                      {project.award && (
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-300 text-xs font-medium backdrop-blur-sm shadow-sm max-w-full">
-                          <Trophy className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 shrink-0" />
-                          <span className="leading-snug">{project.award}</span>
-                        </div>
-                      )}
-
                       {/* Title */}
                       <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-heading text-foreground">
                         {project.title}
@@ -388,12 +379,6 @@ export const Projects = () => {
                   <span className="text-[10px] font-mono uppercase tracking-widest text-secondary-foreground font-bold">
                     Resources Hub
                   </span>
-                  {activeModalProject.award && (
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-300 text-[11px] font-medium my-1.5 max-w-full">
-                      <Trophy className="w-3 h-3 text-amber-500 dark:text-amber-400 shrink-0" />
-                      <span className="leading-snug">{activeModalProject.award}</span>
-                    </div>
-                  )}
                   <h4 className="text-xl font-bold text-foreground font-heading mt-1">
                     {activeModalProject.title}
                   </h4>
